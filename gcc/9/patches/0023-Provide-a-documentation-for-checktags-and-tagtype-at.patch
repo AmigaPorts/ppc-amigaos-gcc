@@ -1,7 +1,7 @@
-From 89c080a91614aa790eddf909083abf852278bb13 Mon Sep 17 00:00:00 2001
+From d06dd047cb743eb18c193bdc043190dcdcf3e940 Mon Sep 17 00:00:00 2001
 From: Sebastian Bauer <mail@sebastianbauer.info>
 Date: Sun, 29 Apr 2018 00:08:22 +0200
-Subject: [PATCH 23/27] Provide a documentation for checktags and tagtype
+Subject: [PATCH 23/32] Provide a documentation for checktags and tagtype
  attributes.
 
 ---
@@ -9,10 +9,10 @@ Subject: [PATCH 23/27] Provide a documentation for checktags and tagtype
  1 file changed, 28 insertions(+)
 
 diff --git a/gcc/doc/extend.texi b/gcc/doc/extend.texi
-index 74e4196842260a7904a71279ad08f311660c4527..cb1b4aafd131f08f7ec4641ddfdb76871dccd99a 100644
+index 209856dfa457934acf135fd4a6b03f9913964c85..8ac9b7a707a7ca4202bcf95e0d1c8977ad8d222e 100644
 --- a/gcc/doc/extend.texi
 +++ b/gcc/doc/extend.texi
-@@ -3680,12 +3680,24 @@ int VARARGS68K __amigaos4_check68k_trampoline(int num_args,
+@@ -3971,12 +3971,24 @@ int VARARGS68K __amigaos4_check68k_trampoline(int num_args,
      va_end(args);
  
      return(result);
@@ -37,7 +37,7 @@ index 74e4196842260a7904a71279ad08f311660c4527..cb1b4aafd131f08f7ec4641ddfdb7687
  symbol rather than a global.  This is primarily useful in defining
  library functions that can be overridden in user code, though it can
  also be used with non-function declarations.  Weak symbols are supported
-@@ -7933,12 +7945,28 @@ is used anywhere in the source file.  This is useful when identifying
+@@ -8582,12 +8594,28 @@ is used anywhere in the source file.  This is useful when identifying
  enumerators that are expected to be removed in a future version of a
  program.  The warning also includes the location of the declaration
  of the deprecated enumerator, to enable users to easily find further
@@ -67,5 +67,5 @@ index 74e4196842260a7904a71279ad08f311660c4527..cb1b4aafd131f08f7ec4641ddfdb7687
  @cindex Statement Attributes
  
 -- 
-2.30.0
+2.11.0
 

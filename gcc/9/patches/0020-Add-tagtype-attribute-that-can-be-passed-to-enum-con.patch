@@ -1,7 +1,7 @@
-From 3bfdbaf33d40f63635c050440989e0c5e495cca8 Mon Sep 17 00:00:00 2001
+From b1b312298accd2720fadca0958b6f8364808ca11 Mon Sep 17 00:00:00 2001
 From: Sebastian Bauer <mail@sebastianbauer.info>
 Date: Tue, 24 Apr 2018 06:29:13 +0200
-Subject: [PATCH 20/27] Add tagtype attribute that can be passed to enum
+Subject: [PATCH 20/32] Add tagtype attribute that can be passed to enum
  constants.
 
 The tagtype attribute can be applied to enum constants in order to annotate
@@ -13,17 +13,17 @@ implemented for the same purpose but that has problems with optimizations.
 Also, the preprocessor can now be used to hide the attribute for compilers
 that don't support it.
 ---
- gcc/c/c-parser.c                   | 32 ++++++++++++++++++++++++++++++
+ gcc/c/c-parser.c                   | 16 ++++++++++++++++
  gcc/config/rs6000/amigaos-protos.h |  1 +
- gcc/config/rs6000/amigaos.c        | 26 ++++++++++++++++++++++++
+ gcc/config/rs6000/amigaos.c        | 26 ++++++++++++++++++++++++++
  gcc/config/rs6000/amigaos.h        |  1 +
- 4 files changed, 60 insertions(+)
+ 4 files changed, 44 insertions(+)
 
 diff --git a/gcc/c/c-parser.c b/gcc/c/c-parser.c
-index d018d115d902cdef9b93ad56a0eaaa83176ce811..a0a9e0b587ef150ff19e00e2ae05a1864081aa6d 100644
+index 69b9a10b397c87969f93f6dffe12d522b64cd292..658dbebd930dbd9c3e5be1a3f581dcdeb8f590d6 100644
 --- a/gcc/c/c-parser.c
 +++ b/gcc/c/c-parser.c
-@@ -3056,12 +3056,28 @@ c_parser_enum_specifier (c_parser *parser)
+@@ -3077,12 +3077,28 @@ c_parser_enum_specifier (c_parser *parser)
  	  else
  	    enum_value = NULL_TREE;
  	  enum_decl = build_enumerator (decl_loc, value_loc,
@@ -52,37 +52,6 @@ index d018d115d902cdef9b93ad56a0eaaa83176ce811..a0a9e0b587ef150ff19e00e2ae05a186
  	  if (c_parser_next_token_is (parser, CPP_COMMA))
  	    {
  	      comma_loc = c_parser_peek_token (parser)->location;
-@@ -4458,14 +4474,30 @@ c_parser_attributes (c_parser *parser)
- 	  else
- 	    {
- 	      if (c_parser_next_token_is (parser, CPP_CLOSE_PAREN))
- 		attr_args = NULL_TREE;
- 	      else
- 		{
-+		  if (!strcmp("tagtype", IDENTIFIER_POINTER (attr_name)))
-+		    {
-+		      /* Parse type that is supplied with the tagtype attribute
-+		       * To follow the usual grammar, we turn the type
-+		       * into a cast expression of the form: (type)0
-+		       */
-+		      location_t loc = c_parser_peek_token (parser)->location;
-+		      c_type_name *type_name = c_parser_type_name (parser);
-+
-+		      expr_list = make_tree_vector ();
-+		      tree cast_expr = c_cast_expr (loc, type_name, build_int_cst(NULL_TREE, 0));
-+		      vec_safe_push (expr_list, cast_expr);
-+		      /* Using goto here to avoid whitespace changes of the original code */
-+		      goto expression_done;
-+		    }
- 		  expr_list = c_parser_expr_list (parser, false, true,
- 						  NULL, NULL, NULL, NULL);
-+expression_done:
- 		  attr_args = build_tree_list_vec (expr_list);
- 		  release_tree_vector (expr_list);
- 		}
- 	    }
- 
- 	  attr = build_tree_list (attr_name, attr_args);
 diff --git a/gcc/config/rs6000/amigaos-protos.h b/gcc/config/rs6000/amigaos-protos.h
 index 5a0b8006e2f6b6b8877e092994567233077594f1..df81cfa81701262bebfbad60b580ab75517aa276 100644
 --- a/gcc/config/rs6000/amigaos-protos.h
@@ -163,5 +132,5 @@ index f88bfe5f879cb4ca09f067d907ec36ef0b4c2da3..0ed2a2b9ca1abe33f6534008f0c9592a
  /* Overrides */
  
 -- 
-2.30.0
+2.11.0
 

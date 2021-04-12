@@ -1,14 +1,14 @@
-From 0cd7892bc1f040ddf16ed3fd37b1826e3fb87ee2 Mon Sep 17 00:00:00 2001
+From 19c55bd286093fd84712b419225f529d1fe7de3d Mon Sep 17 00:00:00 2001
 From: Sebastian Bauer <mail@sebastianbauer.info>
 Date: Wed, 4 Apr 2018 22:48:33 +0200
-Subject: [PATCH 13/27] Rerun make maint-deps in libiberty.
+Subject: [PATCH 13/32] Rerun make maint-deps in libiberty.
 
 ---
  libiberty/Makefile.in | 36 ++++++++++++++++++++++--------------
  1 file changed, 22 insertions(+), 14 deletions(-)
 
 diff --git a/libiberty/Makefile.in b/libiberty/Makefile.in
-index ae3a66d43cfb5be9e9ae4b2f46136bfc27d5070f..fa4f5f17cb5d9d6d78b3c071c738dec302193927 100644
+index 5b26b86d0698e0f74cb1d7f2bd5528d9c4684d4a..3f453c4c5542b4f86bb987a69ee03eabc5f62077 100644
 --- a/libiberty/Makefile.in
 +++ b/libiberty/Makefile.in
 @@ -560,13 +560,14 @@ $(CONFIGURED_OFILES): stamp-picdir stamp-noasandir
@@ -161,5 +161,5 @@ index ae3a66d43cfb5be9e9ae4b2f46136bfc27d5070f..fa4f5f17cb5d9d6d78b3c071c738dec3
  	  $(COMPILE.c) $(PICFLAG) $(NOASANFLAG) $(srcdir)/xmalloc.c -o noasan/$@; \
  	else true; fi
 -- 
-2.30.0
+2.11.0
 

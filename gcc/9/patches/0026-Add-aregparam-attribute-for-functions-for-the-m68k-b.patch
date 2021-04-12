@@ -1,23 +1,23 @@
-From 6546786e0f3699b8663fce5cdb4530615f09e36a Mon Sep 17 00:00:00 2001
+From 48d2d3a0c949a93cc54958ffac4fe80bdb07d0ad Mon Sep 17 00:00:00 2001
 From: Sebastian Bauer <mail@sebastianbauer.info>
 Date: Sat, 27 Oct 2018 08:06:21 +0200
-Subject: [PATCH 26/27] Add aregparam attribute for functions for the m68k
+Subject: [PATCH 26/32] Add aregparam attribute for functions for the m68k
  backend.
 
 These can be used to pass arguments to directly named registers.
 This patch is based on changes that can be found in the mooli/gcc-amiga
 GitHub repository.
 ---
- gcc/config/m68k/m68k-protos.h |   7 ++
- gcc/config/m68k/m68k.c        | 126 ++++++++++++++++++++++++++++++++--
- gcc/config/m68k/m68k.h        |  27 +++++---
+ gcc/config/m68k/m68k-protos.h |   7 +++
+ gcc/config/m68k/m68k.c        | 126 ++++++++++++++++++++++++++++++++++++++++--
+ gcc/config/m68k/m68k.h        |  27 +++++----
  3 files changed, 144 insertions(+), 16 deletions(-)
 
 diff --git a/gcc/config/m68k/m68k-protos.h b/gcc/config/m68k/m68k-protos.h
-index 1f6a68f62b738de96133be4a702e6b05b67922fe..bbc3a960077a48350b861c83e5db2132d8af904b 100644
+index abd920e70f36ca623dce6cdc097f6e4c3e5235a0..8dc4e74a5267bca325e42e6522e8a6251630e1e2 100644
 --- a/gcc/config/m68k/m68k-protos.h
 +++ b/gcc/config/m68k/m68k-protos.h
-@@ -97,6 +97,13 @@ extern const char *m68k_cpp_cpu_ident (const char *);
+@@ -96,6 +96,13 @@ extern const char *m68k_cpp_cpu_ident (const char *);
  extern const char *m68k_cpp_cpu_family (const char *);
  extern void init_68881_table (void);
  extern rtx m68k_legitimize_call_address (rtx);
@@ -32,11 +32,11 @@ index 1f6a68f62b738de96133be4a702e6b05b67922fe..bbc3a960077a48350b861c83e5db2132
 +#endif /* RTX_CODE inside TREE_CODE */
 +#endif /* TREE_CODE */
 diff --git a/gcc/config/m68k/m68k.c b/gcc/config/m68k/m68k.c
-index 495a80b759e3b76142f235e674c71ef5d67a7fc7..e1093581ad1e598879952e21e148ed005abfa047 100644
+index 7a0d6f7c62b4c3fd93fe0e6e6985b879854b7810..c56d9dab1393370593671156e9c83bef6bdf7242 100644
 --- a/gcc/config/m68k/m68k.c
 +++ b/gcc/config/m68k/m68k.c
-@@ -353,12 +353,14 @@ static machine_mode m68k_promote_function_mode (const_tree, machine_mode,
- #define TARGET_PROMOTE_FUNCTION_MODE m68k_promote_function_mode
+@@ -357,12 +357,14 @@ static machine_mode m68k_promote_function_mode (const_tree, machine_mode,
+ #define TARGET_HAVE_SPECULATION_SAFE_VALUE speculation_safe_value_not_needed
  
  static const struct attribute_spec m68k_attribute_table[] =
  {
@@ -50,7 +50,7 @@ index 495a80b759e3b76142f235e674c71ef5d67a7fc7..e1093581ad1e598879952e21e148ed00
      m68k_handle_fndecl_attribute, NULL },
    { "interrupt_thread", 0, 0, true,  false, false, false,
      m68k_handle_fndecl_attribute, NULL },
-@@ -1404,18 +1406,102 @@ m68k_reg_present_p (const_rtx parallel, unsigned int regno)
+@@ -1412,18 +1414,102 @@ m68k_reg_present_p (const_rtx parallel, unsigned int regno)
  	return true;
      }
  
@@ -153,7 +153,7 @@ index 495a80b759e3b76142f235e674c71ef5d67a7fc7..e1093581ad1e598879952e21e148ed00
    if (CALL_EXPR_STATIC_CHAIN (exp))
      return false;
  
-@@ -1436,12 +1522,21 @@ m68k_ok_for_sibcall_p (tree decl, tree exp)
+@@ -1444,12 +1530,21 @@ m68k_ok_for_sibcall_p (tree decl, tree exp)
        if (!(rtx_equal_p (cfun_value, call_value)
  	    || (REG_P (cfun_value)
  		&& m68k_reg_present_p (call_value, REGNO (cfun_value)))))
@@ -175,7 +175,7 @@ index 495a80b759e3b76142f235e674c71ef5d67a7fc7..e1093581ad1e598879952e21e148ed00
         undefined if it is calling an interrupt function.  */
      return true;
  
-@@ -1450,32 +1545,51 @@ m68k_ok_for_sibcall_p (tree decl, tree exp)
+@@ -1458,32 +1553,51 @@ m68k_ok_for_sibcall_p (tree decl, tree exp)
    if (decl && m68k_get_function_kind (decl) == kind)
      return true;
    
@@ -234,7 +234,7 @@ index 495a80b759e3b76142f235e674c71ef5d67a7fc7..e1093581ad1e598879952e21e148ed00
  
  rtx
 diff --git a/gcc/config/m68k/m68k.h b/gcc/config/m68k/m68k.h
-index 506fa4e50e76f386d683e42351d38ca2c5e3d661..41baf9fc61c3a6784845ee27a3d5c700aeecc6a4 100644
+index fc65e524b139a6d43e528956a788b9110aebaf2e..ff77c1108f406de7c85f4160b83fb685e3f0f448 100644
 --- a/gcc/config/m68k/m68k.h
 +++ b/gcc/config/m68k/m68k.h
 @@ -484,22 +484,29 @@ extern enum reg_class regno_reg_class[];
@@ -278,5 +278,5 @@ index 506fa4e50e76f386d683e42351d38ca2c5e3d661..41baf9fc61c3a6784845ee27a3d5c700
  #define EXIT_IGNORE_STACK 1
  
 -- 
-2.30.0
+2.11.0
 

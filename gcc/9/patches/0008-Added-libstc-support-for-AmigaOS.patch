@@ -1,15 +1,15 @@
-From 2aac08d334faddce051e4937c7e9609f226fcb49 Mon Sep 17 00:00:00 2001
+From ad7ead8f8064e66ea8508f3dcba43f62a489a41b Mon Sep 17 00:00:00 2001
 From: Sebastian Bauer <mail@sebastianbauer.info>
 Date: Fri, 22 Jan 2016 20:04:50 +0100
-Subject: [PATCH 08/27] Added libstc++ support for AmigaOS.
+Subject: [PATCH 08/32] Added libstc++ support for AmigaOS.
 
 ---
- libstdc++-v3/config/os/amigaos/ctype_base.h   |  59 ++++++
- .../config/os/amigaos/ctype_configure_char.cc |  99 ++++++++++
- libstdc++-v3/config/os/amigaos/ctype_inline.h | 173 +++++++++++++++++
- .../config/os/amigaos/error_constants.h       | 178 ++++++++++++++++++
- libstdc++-v3/config/os/amigaos/os_defines.h   |  43 +++++
- libstdc++-v3/configure.host                   |   3 +
+ libstdc++-v3/config/os/amigaos/ctype_base.h        |  59 +++++++
+ .../config/os/amigaos/ctype_configure_char.cc      |  99 ++++++++++++
+ libstdc++-v3/config/os/amigaos/ctype_inline.h      | 173 ++++++++++++++++++++
+ libstdc++-v3/config/os/amigaos/error_constants.h   | 178 +++++++++++++++++++++
+ libstdc++-v3/config/os/amigaos/os_defines.h        |  43 +++++
+ libstdc++-v3/configure.host                        |   3 +
  6 files changed, 555 insertions(+)
  create mode 100644 libstdc++-v3/config/os/amigaos/ctype_base.h
  create mode 100644 libstdc++-v3/config/os/amigaos/ctype_configure_char.cc
@@ -600,7 +600,7 @@ index 0000000000000000000000000000000000000000..346f063958cd7e80ebf97be4acee0bdf
 +
 +#endif
 diff --git a/libstdc++-v3/configure.host b/libstdc++-v3/configure.host
-index 155a3cdea1bad297b3cd4c21ecd3c7307b5e6ac9..9daab7c3c71169b10f5ff48c70e4d6d13228cf7f 100644
+index f2ff1295d0030c10883edcf1211e56383a159983..323e89361a98520dfe24dea66e5ca3543a8119c1 100644
 --- a/libstdc++-v3/configure.host
 +++ b/libstdc++-v3/configure.host
 @@ -219,12 +219,15 @@ case "${host_os}" in
@@ -620,5 +620,5 @@ index 155a3cdea1bad297b3cd4c21ecd3c7307b5e6ac9..9daab7c3c71169b10f5ff48c70e4d6d1
    cygwin*)
      os_include_dir="os/newlib"
 -- 
-2.30.0
+2.11.0
 

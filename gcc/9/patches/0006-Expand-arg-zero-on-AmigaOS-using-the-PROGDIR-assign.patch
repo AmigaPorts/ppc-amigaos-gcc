@@ -1,7 +1,7 @@
-From 51df5cec532625cc0321b15703b2578480f8598b Mon Sep 17 00:00:00 2001
+From d994439847182f153ca7a25f718e47eb9ecaa456 Mon Sep 17 00:00:00 2001
 From: Sebastian Bauer <mail@sebastianbauer.info>
 Date: Sat, 5 Dec 2015 13:17:26 +0100
-Subject: [PATCH 06/27] Expand arg zero on AmigaOS using the PROGDIR: assign.
+Subject: [PATCH 06/32] Expand arg zero on AmigaOS using the PROGDIR: assign.
 
 This should make sure that the proper relative paths are computed during
 process_command().
@@ -10,10 +10,10 @@ process_command().
  1 file changed, 10 insertions(+)
 
 diff --git a/gcc/gcc.c b/gcc/gcc.c
-index 2fe3d2eb7dcb2cb71e24a2fe2e01f637ea2ce727..f1c28df80dd2173d3a98f152e4d9e5d596cbbedd 100644
+index 4b4975d72ebc3642484a696038a28c7d0964121e..13129535aa522cf3dcfbd0716a58f03d87ede3be 100644
 --- a/gcc/gcc.c
 +++ b/gcc/gcc.c
-@@ -7293,12 +7293,22 @@ driver::~driver ()
+@@ -7353,12 +7353,22 @@ driver::~driver ()
  int
  driver::main (int argc, char **argv)
  {
@@ -37,5 +37,5 @@ index 2fe3d2eb7dcb2cb71e24a2fe2e01f637ea2ce727..f1c28df80dd2173d3a98f152e4d9e5d5
    set_up_specs ();
    putenv_COLLECT_GCC (argv[0]);
 -- 
-2.30.0
+2.11.0
 

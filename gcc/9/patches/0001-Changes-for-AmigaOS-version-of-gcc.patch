@@ -1,49 +1,49 @@
-From 3381d8ff71670dc71a729196270fa6fdec9c5815 Mon Sep 17 00:00:00 2001
+From 9511ecf6645337c5cdc31e5c61a1cfb132f16ba4 Mon Sep 17 00:00:00 2001
 From: Sebastian Bauer <mail@sebastianbauer.info>
 Date: Tue, 17 Feb 2015 20:25:55 +0100
-Subject: [PATCH 01/27] Changes for AmigaOS version of gcc.
+Subject: [PATCH 01/32] Changes for AmigaOS version of gcc.
 
 ---
- fixincludes/configure                 |    1 +
- fixincludes/configure.ac              |    1 +
- gcc/Makefile.in                       |    1 +
- gcc/c-family/c-attribs.c              |   26 +
- gcc/c/c-typeck.c                      |   25 +
- gcc/config.gcc                        |    8 +
- gcc/config.host                       |    6 +
- gcc/config/rs6000/amigaos-protos.h    |   41 +
- gcc/config/rs6000/amigaos.c           |  467 +++++++
- gcc/config/rs6000/amigaos.h           |  437 ++++++
- gcc/config/rs6000/amigaos.opt         |   37 +
- gcc/config/rs6000/rs6000-builtin.def  |    7 +
- gcc/config/rs6000/rs6000.c            |  175 ++-
- gcc/config/rs6000/rs6000.h            |    3 +
- gcc/config/rs6000/rs6000.md           |   27 +-
- gcc/config/rs6000/t-amigaos           |   20 +
- gcc/cp/typeck.c                       |   16 +
- gcc/doc/extend.texi                   |  168 +++
- gcc/doc/invoke.texi                   |  161 +++
- gcc/expr.c                            |    1 -
- gcc/gcc.c                             |   12 +-
- gcc/prefix.c                          |    2 +-
- intl/dcigettext.c                     |    2 +
- libcpp/line-map.c                     |    3 +
- libgcc/config.host                    |    3 +
- libgcc/config/rs6000/t-amigaos        |   45 +
- libiberty/Makefile.in                 |    9 +
- libiberty/basename.c                  |   21 +-
- libiberty/configure                   |    1 +
- libiberty/configure.ac                |    1 +
- libiberty/lrealpath.c                 |    3 +-
- libiberty/make-relative-prefix.c      |   37 +-
- libiberty/make-temp-file.c            |   27 +-
- libiberty/pex-amigaos.c               |  325 +++++
- libstdc++-v3/configure                | 1832 ++++++++++++++++++++++++-
- libstdc++-v3/configure.ac             |    3 +
- libstdc++-v3/crossconfig.m4           |    8 +
- libstdc++-v3/include/c_global/cstddef |    3 +
- libstdc++-v3/include/c_std/cstddef    |    3 +
- 39 files changed, 3901 insertions(+), 67 deletions(-)
+ fixincludes/configure                 |   1 +
+ fixincludes/configure.ac              |   1 +
+ gcc/Makefile.in                       |   1 +
+ gcc/c-family/c-attribs.c              |  26 ++
+ gcc/c/c-typeck.c                      |  25 ++
+ gcc/config.gcc                        |   8 +
+ gcc/config.host                       |   6 +
+ gcc/config/rs6000/amigaos-protos.h    |  41 +++
+ gcc/config/rs6000/amigaos.c           | 467 ++++++++++++++++++++++++++++++++++
+ gcc/config/rs6000/amigaos.h           | 437 +++++++++++++++++++++++++++++++
+ gcc/config/rs6000/amigaos.opt         |  37 +++
+ gcc/config/rs6000/rs6000-builtin.def  |   7 +
+ gcc/config/rs6000/rs6000.c            | 175 ++++++++++++-
+ gcc/config/rs6000/rs6000.h            |   3 +
+ gcc/config/rs6000/rs6000.md           |  27 +-
+ gcc/config/rs6000/t-amigaos           |  20 ++
+ gcc/cp/typeck.c                       |  16 ++
+ gcc/doc/extend.texi                   | 168 ++++++++++++
+ gcc/doc/invoke.texi                   | 161 ++++++++++++
+ gcc/expr.c                            |   1 -
+ gcc/gcc.c                             |  12 +-
+ gcc/prefix.c                          |   2 +-
+ intl/dcigettext.c                     |   2 +
+ libcpp/line-map.c                     |   3 +
+ libgcc/config.host                    |   3 +
+ libgcc/config/rs6000/t-amigaos        |  45 ++++
+ libiberty/Makefile.in                 |   9 +
+ libiberty/basename.c                  |  21 +-
+ libiberty/configure                   |   1 +
+ libiberty/configure.ac                |   1 +
+ libiberty/lrealpath.c                 |   3 +-
+ libiberty/make-relative-prefix.c      |  37 ++-
+ libiberty/make-temp-file.c            |  27 +-
+ libiberty/pex-amigaos.c               | 325 +++++++++++++++++++++++
+ libstdc++-v3/configure                | 160 ++++++++++++
+ libstdc++-v3/configure.ac             |   3 +
+ libstdc++-v3/crossconfig.m4           |   8 +
+ libstdc++-v3/include/c_global/cstddef |   3 +
+ libstdc++-v3/include/c_std/cstddef    |   3 +
+ 39 files changed, 2243 insertions(+), 53 deletions(-)
  create mode 100644 gcc/config/rs6000/amigaos-protos.h
  create mode 100644 gcc/config/rs6000/amigaos.c
  create mode 100644 gcc/config/rs6000/amigaos.h
@@ -53,10 +53,10 @@ Subject: [PATCH 01/27] Changes for AmigaOS version of gcc.
  create mode 100644 libiberty/pex-amigaos.c
 
 diff --git a/fixincludes/configure b/fixincludes/configure
-index e4b03fd588cd92280b658c76844a54a2e535641e..dbf098cf81c3db07943eb3897aa5f0991243c7f3 100755
+index 6e2d67b655b2f0c1914550e0b2e3b97f8391eef0..cde46a525a606d3b87fb75e50d839f53ce02b141 100755
 --- a/fixincludes/configure
 +++ b/fixincludes/configure
-@@ -4752,12 +4752,13 @@ else
+@@ -4813,12 +4813,13 @@ else
  fi
  else
    case $host in
@@ -71,10 +71,10 @@ index e4b03fd588cd92280b658c76844a54a2e535641e..dbf098cf81c3db07943eb3897aa5f099
  
  	* )
 diff --git a/fixincludes/configure.ac b/fixincludes/configure.ac
-index 190f53828744dca8589636325ba6812d80032bea..1a842652fe40ff1fba7eb7bf0aedd13400363cca 100644
+index 14813b910f196a7adc7f185a55d02195c021351f..cdb37b0700d46dde6698dce552959aa404a7733a 100644
 --- a/fixincludes/configure.ac
 +++ b/fixincludes/configure.ac
-@@ -50,12 +50,13 @@ else
+@@ -49,12 +49,13 @@ else
  	TARGET=oneprocess
  fi],
  [case $host in
@@ -89,12 +89,12 @@ index 190f53828744dca8589636325ba6812d80032bea..1a842652fe40ff1fba7eb7bf0aedd134
  
  	* )
 diff --git a/gcc/Makefile.in b/gcc/Makefile.in
-index ad07f0561370d367dcae358847f32d9703e9d764..d8c1e6eb212ad24c9776918f1723c351029a94b4 100644
+index 5f43d9de00ecf0c6f828cbe91e82284e82c6009c..70ee28c7c69b0c0984a3dd988ca82f034e899cce 100644
 --- a/gcc/Makefile.in
 +++ b/gcc/Makefile.in
-@@ -2176,12 +2176,13 @@ default-c.o: config/default-c.c
- CFLAGS-prefix.o += -DPREFIX=\"$(prefix)\" -DBASEVER=$(BASEVER_s)
- prefix.o: $(BASEVER)
+@@ -2156,12 +2156,13 @@ default-d.o: config/default-d.c
+ 	$(COMPILE) $<
+ 	$(POSTCOMPILE)
  
  # Language-independent files.
  
@@ -107,10 +107,10 @@ index ad07f0561370d367dcae358847f32d9703e9d764..d8c1e6eb212ad24c9776918f1723c351
    -DDEFAULT_REAL_TARGET_MACHINE=\"$(real_target_noncanonical)\" \
    -DDEFAULT_TARGET_MACHINE=\"$(target_noncanonical)\" \
 diff --git a/gcc/c-family/c-attribs.c b/gcc/c-family/c-attribs.c
-index 61249cf94771ad0860b9fc8c582f4371fbc13c71..a3792f9bfae8022597391ff45e8c9ede11d85801 100644
+index 93b210eed9ca004a7f9b7fc3e24134bd5c04957a..2b33a0649764196b555d46a5b189ddea4128254a 100644
 --- a/gcc/c-family/c-attribs.c
 +++ b/gcc/c-family/c-attribs.c
-@@ -121,12 +121,13 @@ static tree handle_vector_size_attribute (tree *, tree, tree, int,
+@@ -122,12 +122,13 @@ static tree handle_vector_size_attribute (tree *, tree, tree, int,
  static tree handle_nonnull_attribute (tree *, tree, tree, int, bool *);
  static tree handle_nonstring_attribute (tree *, tree, tree, int, bool *);
  static tree handle_nothrow_attribute (tree *, tree, tree, int, bool *);
@@ -124,7 +124,7 @@ index 61249cf94771ad0860b9fc8c582f4371fbc13c71..a3792f9bfae8022597391ff45e8c9ede
  static tree handle_alloc_align_attribute (tree *, tree, tree, int, bool *);
  static tree handle_assume_aligned_attribute (tree *, tree, tree, int, bool *);
  static tree handle_target_attribute (tree *, tree, tree, int, bool *);
-@@ -381,12 +382,17 @@ const struct attribute_spec c_common_attribute_table[] =
+@@ -377,12 +378,17 @@ const struct attribute_spec c_common_attribute_table[] =
    { "may_alias",	      0, 0, false, true, false, false, NULL, NULL },
    { "cleanup",		      1, 1, true, false, false, false,
  			      handle_cleanup_attribute, NULL },
@@ -142,7 +142,7 @@ index 61249cf94771ad0860b9fc8c582f4371fbc13c71..a3792f9bfae8022597391ff45e8c9ede
       to prevent its usage in source code.  */
    { "type generic",           0, 0, false, true, true, false,
  			      handle_type_generic_attribute, NULL },
-@@ -3313,12 +3319,32 @@ handle_warn_unused_result_attribute (tree *node, tree name,
+@@ -3776,12 +3782,32 @@ handle_warn_unused_result_attribute (tree *node, tree name,
        *no_add_attrs = true;
      }
  
@@ -176,10 +176,10 @@ index 61249cf94771ad0860b9fc8c582f4371fbc13c71..a3792f9bfae8022597391ff45e8c9ede
  			   int ARG_UNUSED (flags), bool *no_add_attrs)
  {
 diff --git a/gcc/c/c-typeck.c b/gcc/c/c-typeck.c
-index 8c4a1939f3db5839cbee9a33a8faf41d337a7fc8..f2aa4d4e3a7284b84233bb8a79ab475ac3f8728c 100644
+index 8286b7d33298afcc60bf4f0d33533b8cd8f96fcf..d5938a4060324397039827d9b6c46602906bf246 100644
 --- a/gcc/c/c-typeck.c
 +++ b/gcc/c/c-typeck.c
-@@ -3010,12 +3010,14 @@ build_function_call_vec (location_t loc, vec<location_t> arg_loc,
+@@ -3017,12 +3017,14 @@ build_function_call_vec (location_t loc, vec<location_t> arg_loc,
    tree fntype, fundecl = NULL_TREE;
    tree name = NULL_TREE, result;
    tree tem;
@@ -194,7 +194,7 @@ index 8c4a1939f3db5839cbee9a33a8faf41d337a7fc8..f2aa4d4e3a7284b84233bb8a79ab475a
  
    /* Convert anything with function type to a pointer-to-function.  */
    if (TREE_CODE (function) == FUNCTION_DECL)
-@@ -3068,12 +3070,35 @@ build_function_call_vec (location_t loc, vec<location_t> arg_loc,
+@@ -3075,12 +3077,35 @@ build_function_call_vec (location_t loc, vec<location_t> arg_loc,
    if (fundecl && TREE_THIS_VOLATILE (fundecl))
      current_function_returns_abnormally = 1;
  
@@ -231,11 +231,11 @@ index 8c4a1939f3db5839cbee9a33a8faf41d337a7fc8..f2aa4d4e3a7284b84233bb8a79ab475a
  			     origtypes, function, fundecl);
    if (nargs < 0)
 diff --git a/gcc/config.gcc b/gcc/config.gcc
-index 47cfce25deed54d2c26719557ba327b83fd3c3d7..381e525612a825f6d44c2c714d0612da8f083bc6 100644
+index 09fb9ecd2cdb437d07b2d825151bb38e4b257d98..78c773b4024103bdb9c9ca52ab82444ebad492ba 100644
 --- a/gcc/config.gcc
 +++ b/gcc/config.gcc
-@@ -2386,12 +2386,20 @@ nvptx-*)
- 	fi
+@@ -2569,12 +2569,20 @@ or1k*-*-*)
+ 	esac
  	;;
  pdp11-*-*)
  	tm_file="${tm_file} newlib-stdint.h"
@@ -256,10 +256,10 @@ index 47cfce25deed54d2c26719557ba327b83fd3c3d7..381e525612a825f6d44c2c714d0612da
  #	;;
  powerpc-*-darwin*)
 diff --git a/gcc/config.host b/gcc/config.host
-index c65569da2e922e96814cad91c549e7561e1268d6..ec4eb466506dfc20be35569c7c51f5a47624a474 100644
+index 816a0f06cb7dc7cd923e7f34ca4ac488f28fc30f..459fc80162e174150c4f4ffe92622966244d3d02 100644
 --- a/gcc/config.host
 +++ b/gcc/config.host
-@@ -256,12 +256,18 @@ case ${host} in
+@@ -252,12 +252,18 @@ case ${host} in
      host_lto_plugin_soname=liblto_plugin-0.dll
      ;;
    i[34567]86-*-darwin* | x86_64-*-darwin*)
@@ -1285,10 +1285,10 @@ index 0000000000000000000000000000000000000000..93d74f10bea8c1b23c82a9650bb0c3c1
 +Target Driver
 +Generated binary employs the dynamic linker for shared objects.
 diff --git a/gcc/config/rs6000/rs6000-builtin.def b/gcc/config/rs6000/rs6000-builtin.def
-index fa0f3f1e8a59c9daaebcfa899cf8a7e8648dd408..c60de6ba9a95cf6106413fb870390384b24cb372 100644
+index 0a2bdb79e15c638b4cd9cef3c9632eb0f2a76cf3..0aa2a1b1d8a8b92c4ed53775fb0d5bfe0b7b5eb7 100644
 --- a/gcc/config/rs6000/rs6000-builtin.def
 +++ b/gcc/config/rs6000/rs6000-builtin.def
-@@ -2584,6 +2584,13 @@ BU_SPECIAL_X (RS6000_BUILTIN_CPU_IS, "__builtin_cpu_is",
+@@ -2546,6 +2546,13 @@ BU_SPECIAL_X (RS6000_BUILTIN_CPU_IS, "__builtin_cpu_is",
  BU_SPECIAL_X (RS6000_BUILTIN_CPU_SUPPORTS, "__builtin_cpu_supports",
  	      RS6000_BTM_ALWAYS, RS6000_BTC_MISC)
  
@@ -1303,10 +1303,10 @@ index fa0f3f1e8a59c9daaebcfa899cf8a7e8648dd408..c60de6ba9a95cf6106413fb870390384
 +		    RS6000_BTC_MISC,		/* ATTR */	\
 +		    CODE_FOR_nothing)		/* ICODE */
 diff --git a/gcc/config/rs6000/rs6000.c b/gcc/config/rs6000/rs6000.c
-index 8cf6bd54b2f605e5812df3ae3d50422b22c90aea..5c62d96fe8523818dacfdc49be4578596149fd4a 100644
+index f0de18d4dcd0baf35bfb5c149fc4875b68546ebc..703b1fcbfcfe7ea4e51d594348bd70e527890fd4 100644
 --- a/gcc/config/rs6000/rs6000.c
 +++ b/gcc/config/rs6000/rs6000.c
-@@ -143,12 +143,18 @@ typedef struct rs6000_stack {
+@@ -140,12 +140,18 @@ typedef struct rs6000_stack {
    int altivec_size;		/* size of saved AltiVec registers */
    int cr_size;			/* size to hold CR if not in fixed area */
    int vrsave_size;		/* size to hold VRSAVE */
@@ -1325,7 +1325,7 @@ index 8cf6bd54b2f605e5812df3ae3d50422b22c90aea..5c62d96fe8523818dacfdc49be457859
     This is added to the cfun structure.  */
  typedef struct GTY(()) machine_function
  {
-@@ -1647,12 +1653,18 @@ static const struct attribute_spec rs6000_attribute_table[] =
+@@ -1628,12 +1634,18 @@ static const struct attribute_spec rs6000_attribute_table[] =
  
  #undef TARGET_ASM_FUNCTION_PROLOGUE
  #define TARGET_ASM_FUNCTION_PROLOGUE rs6000_output_function_prologue
@@ -1344,7 +1344,7 @@ index 8cf6bd54b2f605e5812df3ae3d50422b22c90aea..5c62d96fe8523818dacfdc49be457859
  #undef TARGET_LEGITIMIZE_ADDRESS
  #define TARGET_LEGITIMIZE_ADDRESS rs6000_legitimize_address
  
-@@ -8922,12 +8934,20 @@ rs6000_legitimize_address (rtx x, rtx oldx ATTRIBUTE_UNUSED,
+@@ -8205,12 +8217,20 @@ rs6000_legitimize_address (rtx x, rtx oldx ATTRIBUTE_UNUSED,
      {
        enum tls_model model = SYMBOL_REF_TLS_MODEL (x);
        if (model != 0)
@@ -1365,7 +1365,7 @@ index 8cf6bd54b2f605e5812df3ae3d50422b22c90aea..5c62d96fe8523818dacfdc49be457859
      case E_TFmode:
      case E_TDmode:
      case E_TImode:
-@@ -10761,12 +10781,21 @@ rs6000_emit_move (rtx dest, rtx source, machine_mode mode)
+@@ -10042,12 +10062,21 @@ rs6000_emit_move (rtx dest, rtx source, machine_mode mode)
  	  tmp = gen_rtx_PLUS (mode, tmp, addend);
  	  tmp = force_operand (tmp, operands[0]);
  	}
@@ -1384,10 +1384,10 @@ index 8cf6bd54b2f605e5812df3ae3d50422b22c90aea..5c62d96fe8523818dacfdc49be457859
    /* 128-bit constant floating-point values on Darwin should really be loaded
       as two parts.  However, this premature splitting is a problem when DFmode
       values can go into Altivec registers.  */
-   if (FLOAT128_IBM_P (mode) && !reg_addr[DFmode].scalar_in_vmx_p
-       && GET_CODE (operands[1]) == CONST_DOUBLE)
+   if (TARGET_MACHO && CONST_DOUBLE_P (operands[1]) && FLOAT128_IBM_P (mode)
+       && !reg_addr[DFmode].scalar_in_vmx_p)
      {
-@@ -11009,12 +11038,20 @@ rs6000_emit_move (rtx dest, rtx source, machine_mode mode)
+@@ -10284,12 +10313,20 @@ rs6000_emit_move (rtx dest, rtx source, machine_mode mode)
  #endif
  	      emit_insn (gen_macho_high (target, operands[1]));
  	      emit_insn (gen_macho_low (operands[0], target, operands[1]));
@@ -1408,12 +1408,12 @@ index 8cf6bd54b2f605e5812df3ae3d50422b22c90aea..5c62d96fe8523818dacfdc49be457859
  	}
  
        /* If this is a SYMBOL_REF that refers to a constant pool entry,
-@@ -11512,12 +11549,18 @@ init_cumulative_args (CUMULATIVE_ARGS *cum, tree fntype,
-   if ((!fntype && rs6000_default_long_calls)
-       || (fntype
- 	  && lookup_attribute ("longcall", TYPE_ATTRIBUTES (fntype))
- 	  && !lookup_attribute ("shortcall", TYPE_ATTRIBUTES (fntype))))
-     cum->call_cookie |= CALL_LONG;
+@@ -10806,12 +10843,18 @@ init_cumulative_args (CUMULATIVE_ARGS *cum, tree fntype,
+ 	  if (!(fntype
+ 		&& lookup_attribute ("plt", TYPE_ATTRIBUTES (fntype))))
+ 	    cum->call_cookie |= CALL_LONG;
+ 	}
+     }
  
 +  /* AmigaOS4: Check if either libcall or linear varargs, set appropriate cookie */
 +  if (fntype && (lookup_attribute ("libcall", TYPE_ATTRIBUTES (fntype))))
@@ -1427,7 +1427,7 @@ index 8cf6bd54b2f605e5812df3ae3d50422b22c90aea..5c62d96fe8523818dacfdc49be457859
        if (fntype)
  	{
  	  tree ret_type = TREE_TYPE (fntype);
-@@ -12214,12 +12257,21 @@ rs6000_function_arg_advance_1 (CUMULATIVE_ARGS *cum, machine_mode mode,
+@@ -11503,12 +11546,21 @@ rs6000_function_arg_advance_1 (CUMULATIVE_ARGS *cum, machine_mode mode,
  	  fprintf (stderr, "nargs = %4d, proto = %d, mode = %4s, ",
  		   cum->nargs_prototype, cum->prototype, GET_MODE_NAME (mode));
  	  fprintf (stderr, "named = %d, align = %d, depth = %d\n",
@@ -1449,7 +1449,7 @@ index 8cf6bd54b2f605e5812df3ae3d50422b22c90aea..5c62d96fe8523818dacfdc49be457859
  rs6000_function_arg_advance (cumulative_args_t cum, machine_mode mode,
  			     const_tree type, bool named)
  {
-@@ -13283,12 +13335,18 @@ setup_incoming_varargs (cumulative_args_t cum, machine_mode mode,
+@@ -12572,12 +12624,18 @@ setup_incoming_varargs (cumulative_args_t cum, machine_mode mode,
        save_area = crtl->args.internal_arg_pointer;
  
        if (targetm.calls.must_pass_in_stack (mode, type))
@@ -1468,7 +1468,7 @@ index 8cf6bd54b2f605e5812df3ae3d50422b22c90aea..5c62d96fe8523818dacfdc49be457859
      {
        int n_gpr, nregs = GP_ARG_NUM_REG - first_reg_offset;
  
-@@ -13409,13 +13467,13 @@ rs6000_build_builtin_va_list (void)
+@@ -12695,13 +12753,13 @@ rs6000_build_builtin_va_list (void)
    return build_array_type (record, build_index_type (size_zero_node));
  }
  
@@ -1483,7 +1483,7 @@ index 8cf6bd54b2f605e5812df3ae3d50422b22c90aea..5c62d96fe8523818dacfdc49be457859
    tree gpr, fpr, ovf, sav, t;
  
    /* Only SVR4 needs something special.  */
-@@ -13444,12 +13502,21 @@ rs6000_va_start (tree valist, rtx nextarg)
+@@ -12730,12 +12788,21 @@ rs6000_va_start (tree valist, rtx nextarg)
    words = crtl->args.info.words;
    n_gpr = MIN (crtl->args.info.sysv_gregno - GP_ARG_MIN_REG,
  	       GP_ARG_NUM_REG);
@@ -1505,7 +1505,7 @@ index 8cf6bd54b2f605e5812df3ae3d50422b22c90aea..5c62d96fe8523818dacfdc49be457859
  	     words, n_gpr, n_fpr);
  
    if (cfun->va_list_gpr_size)
-@@ -13495,12 +13562,18 @@ rs6000_va_start (tree valist, rtx nextarg)
+@@ -12781,12 +12848,18 @@ rs6000_va_start (tree valist, rtx nextarg)
      t = fold_build_pointer_plus_hwi (t, cfun->machine->varargs_save_offset);
    t = build2 (MODIFY_EXPR, TREE_TYPE (sav), sav, t);
    TREE_SIDE_EFFECTS (t) = 1;
@@ -1524,12 +1524,12 @@ index 8cf6bd54b2f605e5812df3ae3d50422b22c90aea..5c62d96fe8523818dacfdc49be457859
  rs6000_gimplify_va_arg (tree valist, tree type, gimple_seq *pre_p,
  			gimple_seq *post_p)
  {
-@@ -17016,12 +17089,20 @@ rs6000_expand_builtin (tree exp, rtx target, rtx subtarget ATTRIBUTE_UNUSED,
+@@ -16388,12 +16461,20 @@ rs6000_expand_builtin (tree exp, rtx target, rtx subtarget ATTRIBUTE_UNUSED,
+       case CODE_FOR_xststdcnegqp_kf:	icode = CODE_FOR_xststdcnegqp_tf; break;
        case CODE_FOR_xsiexpqp_kf:	icode = CODE_FOR_xsiexpqp_tf;	break;
        case CODE_FOR_xsiexpqpf_kf:	icode = CODE_FOR_xsiexpqpf_tf;	break;
        case CODE_FOR_xststdcqp_kf:	icode = CODE_FOR_xststdcqp_tf;	break;
        }
- #endif
  
 +  /* Try subtarget first */
 +#ifdef SUBTARGET_EXPAND_BUILTIN
@@ -1545,7 +1545,7 @@ index 8cf6bd54b2f605e5812df3ae3d50422b22c90aea..5c62d96fe8523818dacfdc49be457859
        const char *name2 = (icode != CODE_FOR_nothing)
  			   ? get_insn_name ((int) icode)
  			   : "nothing";
-@@ -22188,13 +22269,22 @@ print_operand_address (FILE *file, rtx x)
+@@ -21478,13 +21559,22 @@ print_operand_address (FILE *file, rtx x)
  #endif
  #if TARGET_ELF
    else if (GET_CODE (x) == LO_SUM && REG_P (XEXP (x, 0))
@@ -1568,7 +1568,7 @@ index 8cf6bd54b2f605e5812df3ae3d50422b22c90aea..5c62d96fe8523818dacfdc49be457859
      {
        /* This hack along with a corresponding hack in
  	 rs6000_output_addr_const_extra arranges to output addends
-@@ -25146,12 +25236,25 @@ rs6000_stack_info (void)
+@@ -24715,12 +24805,25 @@ rs6000_stack_info (void)
    info->altivec_size = 16 * (LAST_ALTIVEC_REGNO + 1
  				 - info->first_altivec_reg_save);
  
@@ -1594,7 +1594,7 @@ index 8cf6bd54b2f605e5812df3ae3d50422b22c90aea..5c62d96fe8523818dacfdc49be457859
        || save_reg_p (CR4_REGNO))
      {
        info->cr_save_p = 1;
-@@ -25249,13 +25352,18 @@ rs6000_stack_info (void)
+@@ -24818,13 +24921,18 @@ rs6000_stack_info (void)
        info->lr_save_offset = 2*reg_size;
        break;
  
@@ -1613,7 +1613,7 @@ index 8cf6bd54b2f605e5812df3ae3d50422b22c90aea..5c62d96fe8523818dacfdc49be457859
  	  info->vrsave_save_offset = info->cr_save_offset - info->vrsave_size;
  
  	  /* Align stack so vector save area is on a quadword boundary.  */
-@@ -25284,12 +25392,16 @@ rs6000_stack_info (void)
+@@ -24853,12 +24961,16 @@ rs6000_stack_info (void)
  				  + ehrd_size
  				  + ehcr_size
  				  + info->cr_size
@@ -1630,7 +1630,7 @@ index 8cf6bd54b2f605e5812df3ae3d50422b22c90aea..5c62d96fe8523818dacfdc49be457859
  				   ABI_STACK_BOUNDARY / BITS_PER_UNIT);
  
    /* Determine if we need to save the link register.  */
-@@ -25393,12 +25505,17 @@ debug_stack_info (rs6000_stack_t *info)
+@@ -24962,12 +25074,17 @@ debug_stack_info (rs6000_stack_t *info)
    if (info->lr_save_p)
      fprintf (stderr, "\tlr_save_p           = %5d\n", info->lr_save_p);
  
@@ -1648,7 +1648,7 @@ index 8cf6bd54b2f605e5812df3ae3d50422b22c90aea..5c62d96fe8523818dacfdc49be457859
    if (info->push_p)
      fprintf (stderr, "\tpush_p              = %5d\n", info->push_p);
  
-@@ -25425,12 +25542,17 @@ debug_stack_info (rs6000_stack_t *info)
+@@ -24994,12 +25111,17 @@ debug_stack_info (rs6000_stack_t *info)
    if (info->cr_save_p)
      fprintf (stderr, "\tcr_save_offset      = %5d\n", info->cr_save_offset);
  
@@ -1666,7 +1666,7 @@ index 8cf6bd54b2f605e5812df3ae3d50422b22c90aea..5c62d96fe8523818dacfdc49be457859
  
    if (info->vars_size)
      fprintf (stderr, "\tvars_size           = " HOST_WIDE_INT_PRINT_DEC"\n",
-@@ -25451,12 +25573,17 @@ debug_stack_info (rs6000_stack_t *info)
+@@ -25020,12 +25142,17 @@ debug_stack_info (rs6000_stack_t *info)
    if (info->altivec_size)
      fprintf (stderr, "\taltivec_size        = %5d\n", info->altivec_size);
  
@@ -1684,7 +1684,7 @@ index 8cf6bd54b2f605e5812df3ae3d50422b22c90aea..5c62d96fe8523818dacfdc49be457859
  
    if (info->cr_size)
      fprintf (stderr, "\tcr_size             = %5d\n", info->cr_size);
-@@ -27809,12 +27936,28 @@ rs6000_emit_prologue (void)
+@@ -27364,12 +27491,28 @@ rs6000_emit_prologue (void)
  			     sp_off - frame_off);
  
  	  offset += reg_size;
@@ -1713,7 +1713,7 @@ index 8cf6bd54b2f605e5812df3ae3d50422b22c90aea..5c62d96fe8523818dacfdc49be457859
        rtvec p;
  
        for (i = 0; ; ++i)
-@@ -28270,12 +28413,19 @@ rs6000_emit_prologue (void)
+@@ -27825,12 +27968,19 @@ rs6000_emit_prologue (void)
  
        if (!info->lr_save_p)
  	emit_move_insn (lr, gen_rtx_REG (Pmode, 0));
@@ -1733,7 +1733,7 @@ index 8cf6bd54b2f605e5812df3ae3d50422b22c90aea..5c62d96fe8523818dacfdc49be457859
       register values in the caller of this function.  This R2 may have
       already been changed from the value in the caller.
       We don't attempt to write accurate DWARF EH frame info for R2
-@@ -28331,12 +28481,17 @@ rs6000_output_savres_externs (FILE *file)
+@@ -27886,12 +28036,17 @@ rs6000_output_savres_externs (FILE *file)
  		     & REST_NOINLINE_FPRS_DOESNT_RESTORE_LR) == 0;
  	  int sel = SAVRES_FPR | (lr ? SAVRES_LR : 0);
  	  name = rs6000_savres_routine_name (regno, sel);
@@ -1751,7 +1751,7 @@ index 8cf6bd54b2f605e5812df3ae3d50422b22c90aea..5c62d96fe8523818dacfdc49be457859
  
  static void
  rs6000_output_function_prologue (FILE *file)
-@@ -29213,12 +29368,30 @@ rs6000_emit_epilogue (int sibcall)
+@@ -28761,12 +28916,30 @@ rs6000_emit_epilogue (int sibcall)
  				      + reg_size * (int) i);
  
  	  emit_move_insn (gen_rtx_REG (reg_mode, regno), mem);
@@ -1783,10 +1783,10 @@ index 8cf6bd54b2f605e5812df3ae3d50422b22c90aea..5c62d96fe8523818dacfdc49be457859
        /* We are jumping to an out-of-line function.  */
        rtx ptr_reg;
 diff --git a/gcc/config/rs6000/rs6000.h b/gcc/config/rs6000/rs6000.h
-index b83b304e3ebe0bb9125dccf19c1c2aa3dbde4e27..4de5b54ffd6fc49c2b7a618e046bf1f36bd92d6f 100644
+index ff9449c2d45bf162ce68bd422c0ffa25715c97d1..67f4acf1bd5d52fcabbf2a1f7f0b91553cfd7fab 100644
 --- a/gcc/config/rs6000/rs6000.h
 +++ b/gcc/config/rs6000/rs6000.h
-@@ -2699,6 +2699,9 @@ extern GTY(()) tree rs6000_builtin_decls[RS6000_BUILTIN_COUNT];
+@@ -2510,6 +2510,9 @@ extern GTY(()) tree rs6000_builtin_decls[RS6000_BUILTIN_COUNT];
  
  #define TARGET_SUPPORTS_WIDE_INT 1
  
@@ -1797,10 +1797,10 @@ index b83b304e3ebe0bb9125dccf19c1c2aa3dbde4e27..4de5b54ffd6fc49c2b7a618e046bf1f3
 +/* Used by amigaos port */
 +void rs6000_va_start (tree valist, rtx nextarg);
 diff --git a/gcc/config/rs6000/rs6000.md b/gcc/config/rs6000/rs6000.md
-index 4dbe8e5d133513f0e23affa2680c84f9aedf0a95..f086ad317ffeb21c5333574f07243ac889d96551 100644
+index ad80592765d047db68d61e64bb48a7ec0cf48ddd..4861ba44e108c5c2ef1f42850738ce7a8db8b602 100644
 --- a/gcc/config/rs6000/rs6000.md
 +++ b/gcc/config/rs6000/rs6000.md
-@@ -10189,12 +10189,37 @@
+@@ -10124,12 +10124,37 @@
     "TARGET_TOC"
     "la %0,%a1"
     "&& TARGET_CMODEL != CMODEL_SMALL && reload_completed"
@@ -1838,7 +1838,7 @@ index 4dbe8e5d133513f0e23affa2680c84f9aedf0a95..f086ad317ffeb21c5333574f07243ac8
  ;; be needed there.
  (define_insn "elf_high"
    [(set (match_operand:SI 0 "gpc_reg_operand" "=b*r")
-@@ -10203,13 +10228,13 @@
+@@ -10138,13 +10163,13 @@
    "lis %0,%1@ha")
  
  (define_insn "elf_low"
@@ -1848,11 +1848,11 @@ index 4dbe8e5d133513f0e23affa2680c84f9aedf0a95..f086ad317ffeb21c5333574f07243ac8
 -   "TARGET_ELF && !TARGET_64BIT && !flag_pic"
 +   "TARGET_ELF && !TARGET_64BIT && !flag_pic && !(TARGET_BASEREL && amigaos_baserel_operand(operands[2]))"
     "la %0,%2@l(%1)")
- 
- ;; Call and call_value insns
- (define_expand "call"
-   [(parallel [(call (mem:SI (match_operand 0 "address_operand"))
- 		    (match_operand 1 ""))
+ 
+ (define_insn "*pltseq_tocsave_<mode>"
+   [(set (match_operand:P 0 "memory_operand" "=m")
+ 	(unspec:P [(match_operand:P 1 "gpc_reg_operand" "b")
+ 		   (match_operand:P 2 "symbol_ref_operand" "s")
 diff --git a/gcc/config/rs6000/t-amigaos b/gcc/config/rs6000/t-amigaos
 new file mode 100644
 index 0000000000000000000000000000000000000000..15d9d3fd5a5f0c8109cd158242745fa52b19257e
@@ -1880,10 +1880,10 @@ index 0000000000000000000000000000000000000000..15d9d3fd5a5f0c8109cd158242745fa5
 +MULTILIB_DIRNAMES = newlib clib2
 +#MULTILIB_REUSE = =mcrt=newlib
 diff --git a/gcc/cp/typeck.c b/gcc/cp/typeck.c
-index 5c064086e905cb90c6cfa2a72b35d07ec60db1c4..a855ea38c467c6f5f4f97b8a72debdb51e7b6776 100644
+index c107a321949bd6eeab484ac7836a89a9323fd7a9..654d95e3acd5c4224a2d51c8c4aa8277f737e6db 100644
 --- a/gcc/cp/typeck.c
 +++ b/gcc/cp/typeck.c
-@@ -3788,12 +3788,28 @@ cp_build_function_call_vec (tree function, vec<tree, va_gc> **params,
+@@ -3895,12 +3895,28 @@ cp_build_function_call_vec (tree function, vec<tree, va_gc> **params,
  
        return error_mark_node;
      }
@@ -1913,10 +1913,10 @@ index 5c064086e905cb90c6cfa2a72b35d07ec60db1c4..a855ea38c467c6f5f4f97b8a72debdb5
        allocated = make_tree_vector ();
        params = &allocated;
 diff --git a/gcc/doc/extend.texi b/gcc/doc/extend.texi
-index 2ab45763a6b53d8aa126d0528484e734589d9672..74e4196842260a7904a71279ad08f311660c4527 100644
+index 91679e8b9bae9001645c735cf5078cc928f2b245..209856dfa457934acf135fd4a6b03f9913964c85 100644
 --- a/gcc/doc/extend.texi
 +++ b/gcc/doc/extend.texi
-@@ -3528,12 +3528,164 @@ int foo ()
+@@ -3819,12 +3819,164 @@ int foo ()
  @}
  @end smallexample
  
@@ -2081,7 +2081,7 @@ index 2ab45763a6b53d8aa126d0528484e734589d9672..74e4196842260a7904a71279ad08f311
  symbol rather than a global.  This is primarily useful in defining
  library functions that can be overridden in user code, though it can
  also be used with non-function declarations.  Weak symbols are supported
-@@ -7012,12 +7164,28 @@ For full documentation of the struct attributes please see the
+@@ -7570,12 +7722,28 @@ For full documentation of the struct attributes please see the
  documentation in @ref{x86 Variable Attributes}.
  
  @cindex @code{altivec} variable attribute, PowerPC
@@ -2111,10 +2111,10 @@ index 2ab45763a6b53d8aa126d0528484e734589d9672..74e4196842260a7904a71279ad08f311
  The RL78 back end supports the @code{saddr} variable attribute.  This
  specifies placement of the corresponding variable in the SADDR area,
 diff --git a/gcc/doc/invoke.texi b/gcc/doc/invoke.texi
-index f3d7c5720b7d8f0145c1b94d81964b33952f9217..ee8085fff435aa062c69f666f245ceb4fa68fe22 100644
+index 29585cf15aacbec0ccded93c59cb76e20483bbab..8b8f6c9e4d8302b649a679d8a3245cc150a42abb 100644
 --- a/gcc/doc/invoke.texi
 +++ b/gcc/doc/invoke.texi
-@@ -1302,12 +1302,41 @@ See RS/6000 and PowerPC Options.
+@@ -1317,12 +1317,41 @@ See RS/6000 and PowerPC Options.
  -mauto-litpools  -mno-auto-litpools @gol
  -mtarget-align  -mno-target-align @gol
  -mlongcalls  -mno-longcalls}
@@ -2156,7 +2156,7 @@ index f3d7c5720b7d8f0145c1b94d81964b33952f9217..ee8085fff435aa062c69f666f245ceb4
  @node Overall Options
  @section Options Controlling the Kind of Output
  
-@@ -14570,12 +14599,13 @@ platform.
+@@ -15583,12 +15612,13 @@ platform.
  * VMS Options::
  * VxWorks Options::
  * x86 Options::
@@ -2170,7 +2170,7 @@ index f3d7c5720b7d8f0145c1b94d81964b33952f9217..ee8085fff435aa062c69f666f245ceb4
  @node AArch64 Options
  @subsection AArch64 Options
  @cindex AArch64 Options
-@@ -28186,12 +28216,143 @@ These options are defined for Xstormy16:
+@@ -28891,12 +28921,143 @@ These options are defined for Xstormy16:
  @table @gcctabopt
  @item -msim
  @opindex msim
@@ -2315,10 +2315,10 @@ index f3d7c5720b7d8f0145c1b94d81964b33952f9217..ee8085fff435aa062c69f666f245ceb4
  These options are supported for Xtensa targets:
  
 diff --git a/gcc/expr.c b/gcc/expr.c
-index 8bf5cc28b13000e65662a8a63f75630f324729d3..a636b0948e82b3793a35a3835fa2541f10ebe95b 100644
+index fa15b7eceae9c49132fc7a46c0bd071bfd4107da..5b6222aec877945ed2f33412ef634219f7fb1dd2 100644
 --- a/gcc/expr.c
 +++ b/gcc/expr.c
-@@ -8410,13 +8410,12 @@ expand_expr_real_2 (sepops ops, rtx target, machine_mode tmode,
+@@ -8403,13 +8403,12 @@ expand_expr_real_2 (sepops ops, rtx target, machine_mode tmode,
    tree treeop0, treeop1, treeop2;
  #define REDUCE_BIT_FIELD(expr)	(reduce_bit_field			  \
  				 ? reduce_to_bit_field_precision ((expr), \
@@ -2333,10 +2333,10 @@ index 8bf5cc28b13000e65662a8a63f75630f324729d3..a636b0948e82b3793a35a3835fa2541f
    treeop0 = ops->op0;
    treeop1 = ops->op1;
 diff --git a/gcc/gcc.c b/gcc/gcc.c
-index a716f7082591d105c69f6970eb7856671b15c319..71cd1e5045311dc4f61d359d2786ee1847558dea 100644
+index 4f57765b012ae07bd0c44ba740d439f965af3379..0f541e361c4b00a73e45029cebcd7486abca0f08 100644
 --- a/gcc/gcc.c
 +++ b/gcc/gcc.c
-@@ -2950,13 +2950,13 @@ execute (void)
+@@ -3071,13 +3071,13 @@ execute (void)
        commands[0].argv[0] = (string) ? string : commands[0].argv[0];
      }
  
@@ -2345,13 +2345,13 @@ index a716f7082591d105c69f6970eb7856671b15c319..71cd1e5045311dc4f61d359d2786ee18
        {				/* each command.  */
 -#if defined (__MSDOS__) || defined (OS2) || defined (VMS)
 +#if defined (__MSDOS__) || defined (OS2) || defined (VMS) || defined(AMIGA)
- 	fatal_error (input_location, "-pipe not supported");
+ 	fatal_error (input_location, "%<-pipe%> not supported");
  #endif
  	argbuf[i] = 0; /* Termination of
  						     command args.  */
  	commands[n_commands].prog = argbuf[i + 1];
  	commands[n_commands].argv
-@@ -4566,13 +4566,12 @@ process_command (unsigned int decoded_options_count,
+@@ -4693,13 +4693,12 @@ process_command (unsigned int decoded_options_count,
        add_prefix (&exec_prefixes, standard_exec_prefix, "BINUTILS",
  		  PREFIX_PRIORITY_LAST, 2, 0);
  #endif
@@ -2365,7 +2365,7 @@ index a716f7082591d105c69f6970eb7856671b15c319..71cd1e5045311dc4f61d359d2786ee18
  
    /* Look for tools relative to the location from which the driver is
       running, or, if that is not available, the configured prefix.  */
-@@ -6685,12 +6684,17 @@ give_switch (int switchnum, int omit_first_word)
+@@ -6756,12 +6755,17 @@ give_switch (int switchnum, int omit_first_word)
  	      if (dot)
  		(CONST_CAST (char *, arg))[length] = '.';
  	      do_spec_1 (suffix_subst, 1, NULL);
@@ -2383,7 +2383,7 @@ index a716f7082591d105c69f6970eb7856671b15c319..71cd1e5045311dc4f61d359d2786ee18
    do_spec_1 (" ", 0, NULL);
    switches[switchnum].validated = true;
  }
-@@ -7075,13 +7079,15 @@ is_directory (const char *path1, bool linker)
+@@ -7144,13 +7148,15 @@ is_directory (const char *path1, bool linker)
    len1 = strlen (path1);
    path = (char *) alloca (3 + len1);
    memcpy (path, path1, len1);
@@ -2399,7 +2399,7 @@ index a716f7082591d105c69f6970eb7856671b15c319..71cd1e5045311dc4f61d359d2786ee18
    if (linker
        && IS_DIR_SEPARATOR (path[0])
        && ((cp - path == 6
-@@ -7619,22 +7625,24 @@ driver::set_up_specs () const
+@@ -7685,22 +7691,24 @@ driver::set_up_specs () const
  			      ? gcc_exec_prefix : standard_exec_prefix,
  			      machine_suffix,
  			      standard_startfile_prefix, NULL),
@@ -2425,7 +2425,7 @@ index a716f7082591d105c69f6970eb7856671b15c319..71cd1e5045311dc4f61d359d2786ee18
    for (struct user_specs *uptr = user_specs_head; uptr; uptr = uptr->next)
      {
 diff --git a/gcc/prefix.c b/gcc/prefix.c
-index 596649513818aca3c6ef2ba3c515e61807c81452..88733fc860a12ae699670fb7fd1943a38b6e029a 100644
+index 73da287a78cb005beb6d51b40bd76cf88831ef33..4cc4134c1dfadc427fad06451fc276611b116549 100644
 --- a/gcc/prefix.c
 +++ b/gcc/prefix.c
 @@ -326,13 +326,13 @@ update_path (const char *path, const char *key)
@@ -2464,10 +2464,10 @@ index a8d4a14d273b153b117b507ec76356635ccd876e..a9cc1066050e10b539149027a5c159f2
  # ifndef HAVE_MEMPCPY
  static void *mempcpy PARAMS ((void *dest, const void *src, size_t n));
 diff --git a/libcpp/line-map.c b/libcpp/line-map.c
-index 72fe2c0dcecf587756f978307f61ab6a236c0fc2..ac2c9769d667851678c2314a0b90a131f36f9e88 100644
+index b73f5067c2449ea9ac963eb8ae342f1912fa1c40..39e1b6449b370615b3723e27ac3ff6d945840c81 100644
 --- a/libcpp/line-map.c
 +++ b/libcpp/line-map.c
-@@ -972,12 +972,15 @@ linemap_ordinary_map_lookup (struct line_maps *set, source_location line)
+@@ -959,12 +959,15 @@ linemap_ordinary_map_lookup (struct line_maps *set, location_t line)
  
    mn = LINEMAPS_ORDINARY_CACHE (set);
    mx = LINEMAPS_ORDINARY_USED (set);
@@ -2484,12 +2484,12 @@ index 72fe2c0dcecf587756f978307f61ab6a236c0fc2..ac2c9769d667851678c2314a0b90a131
      }
    else
 diff --git a/libgcc/config.host b/libgcc/config.host
-index b12c86267dac9da8da9e1ab4123d5171c3e07f40..1dde07f79a288b10d3207a42fd40d1015b33b2df 100644
+index 91abc84da036accb75a6761162702688f3ca9d49..e34828997e805244d1e2556b91f162602f4f1b24 100644
 --- a/libgcc/config.host
 +++ b/libgcc/config.host
-@@ -1005,12 +1005,15 @@ nios2-*-*)
- 	tmake_file="$tmake_file nios2/t-nios2 t-softfp-sfdf t-softfp-excl t-softfp"
- 	extra_parts="$extra_parts crti.o crtn.o"
+@@ -1059,12 +1059,15 @@ or1k-*-*)
+ 	tmake_file="$tmake_file or1k/t-or1k"
+ 	tmake_file="$tmake_file t-softfp-sfdf t-softfp"
  	;;
  pdp11-*-*)
  	tmake_file="pdp11/t-pdp11 t-fdpbit"
@@ -2555,7 +2555,7 @@ index 0000000000000000000000000000000000000000..da1e303eed7e60df883971a610e8904d
 +	$(INSTALL_DATA) $(SHLIB_DIR)/$(SHLIB_SONAME) \
 +	  $(DESTDIR)$(inst_libdir)/libgcc$(SHLIB_EXT);
 diff --git a/libiberty/Makefile.in b/libiberty/Makefile.in
-index ed1b334c361514c9010bf39acdcbde1a5ffa595d..ae3a66d43cfb5be9e9ae4b2f46136bfc27d5070f 100644
+index 0be45b4ae8ec6383f1166665bb32d0b260af2579..5b26b86d0698e0f74cb1d7f2bd5528d9c4684d4a 100644
 --- a/libiberty/Makefile.in
 +++ b/libiberty/Makefile.in
 @@ -139,12 +139,13 @@ CFILES = alloca.c argv.c asprintf.c atexit.c				\
@@ -2645,10 +2645,10 @@ index 0f2c069f0ccf5a7d91e4913548e068c247e12efb..6ba5c4aa4f814fbc28f03127d22e9125
    const char *base;
  
 diff --git a/libiberty/configure b/libiberty/configure
-index ccadfaa822404efc833b15c9b7abd5443d5a97ba..bd81dc14b615c8f305a62f6a4b12926a0eb6752b 100755
+index 7a34dabec32b0b383bd33f07811757335f4dd39c..c8627e61151de605456472e182e9d63c5a9c4403 100755
 --- a/libiberty/configure
 +++ b/libiberty/configure
-@@ -7077,12 +7077,13 @@ fi
+@@ -7138,12 +7138,13 @@ fi
  
  # Figure out which version of pexecute to use.
  case "${host}" in
@@ -2660,13 +2660,13 @@ index ccadfaa822404efc833b15c9b7abd5443d5a97ba..bd81dc14b615c8f305a62f6a4b12926a
  esac
  
  
- if test x$gcc_no_link = xyes; then
-   if test "x${ac_cv_func_mmap_fixed_mapped+set}" != xset; then
+ 
+ 
 diff --git a/libiberty/configure.ac b/libiberty/configure.ac
-index 6917cfaf4fbdf2954b269515e510639ce6081c01..e0edfb00ac01b1090151a6039b4888b2809ff452 100644
+index f1ce76010c9acde79c5dc46686a78b2e2f19244e..a84932cc87e1effd98f22fce9bfb528d6036ea12 100644
 --- a/libiberty/configure.ac
 +++ b/libiberty/configure.ac
-@@ -695,12 +695,13 @@ fi
+@@ -694,12 +694,13 @@ fi
  
  # Figure out which version of pexecute to use.
  case "${host}" in
@@ -2681,7 +2681,7 @@ index 6917cfaf4fbdf2954b269515e510639ce6081c01..e0edfb00ac01b1090151a6039b4888b2
  libiberty_AC_FUNC_STRNCMP
  
 diff --git a/libiberty/lrealpath.c b/libiberty/lrealpath.c
-index 5fe4f16ac9ea8f4d9e5c2b8048e014bc1179ba0a..44ed51e55965f374b1bc5778293198b54984d132 100644
+index 7f66dc2b1bd26c41821d409a95f93e216677923d..375b90c40574c80f99ad501012e23ceca210b11d 100644
 --- a/libiberty/lrealpath.c
 +++ b/libiberty/lrealpath.c
 @@ -46,12 +46,13 @@ components will be simplified.  The returned value will be allocated using
@@ -2714,7 +2714,7 @@ index 5fe4f16ac9ea8f4d9e5c2b8048e014bc1179ba0a..44ed51e55965f374b1bc5778293198b5
        {
  	/* PATH_MAX is bounded.  */
 diff --git a/libiberty/make-relative-prefix.c b/libiberty/make-relative-prefix.c
-index eebcff9957e357f124e46841e1b7cf2c7368d9d6..095c6af19d59e939bbcc281acc3192dc3d205299 100644
+index ec0b0ee74940831f760f0c9857b544df23c42baa..adb569d584ed0e483614c902923fb527dc9e5d51 100644
 --- a/libiberty/make-relative-prefix.c
 +++ b/libiberty/make-relative-prefix.c
 @@ -62,44 +62,43 @@ relative prefix can be found, return @code{NULL}.
@@ -2781,7 +2781,7 @@ index eebcff9957e357f124e46841e1b7cf2c7368d9d6..095c6af19d59e939bbcc281acc3192dc
  
  static char *
 diff --git a/libiberty/make-temp-file.c b/libiberty/make-temp-file.c
-index 89faed7f09ec53bdddb62d97bf14cf08e0d4e533..c239695513ecd6095218a8c58a5cb2c14de8f264 100644
+index 2c66e35cc1f515ba16f5c2a6a9d03b66ebb20fc1..b3bfe6306fb8a392bb66b1d6d9e09fa887fd661a 100644
 --- a/libiberty/make-temp-file.c
 +++ b/libiberty/make-temp-file.c
 @@ -37,25 +37,26 @@ Boston, MA 02110-1301, USA.  */
@@ -2813,7 +2813,7 @@ index 89faed7f09ec53bdddb62d97bf14cf08e0d4e533..c239695513ecd6095218a8c58a5cb2c1
  
  /* Name of temporary file.
     mktemp requires 6 trailing X's.  */
- #define TEMP_FILE "ccXXXXXX"
+ #define TEMP_FILE "XXXXXX"
  #define TEMP_FILE_LEN (sizeof(TEMP_FILE) - 1)
  
 @@ -77,17 +78,19 @@ try_dir (const char *dir, const char *base)
@@ -3208,17 +3208,16 @@ index 0000000000000000000000000000000000000000..0c61a108764c8501f8a2e9552c7c0749
 +  return 0;
 +}
 diff --git a/libstdc++-v3/configure b/libstdc++-v3/configure
-index 61457e940ec09c6a2b945a8e290bb038277a6a94..f16bfea81cb0c480488d72c73b2edf5c7e6e7a87 100755
+index 7d134a0034b8f20ab94dbd40d43580e6c7b24975..7c434fd1b708c2e8d8a644f4314d6bde96bc4f29 100755
 --- a/libstdc++-v3/configure
 +++ b/libstdc++-v3/configure
-@@ -78539,12 +78539,171 @@ done
-     $as_echo "#define HAVE_SQRTF 1" >>confdefs.h
+@@ -78610,12 +78610,171 @@ done
  
      $as_echo "#define HAVE_TANF 1" >>confdefs.h
  
      $as_echo "#define HAVE_TANHF 1" >>confdefs.h
  
-+    ;;
+     ;;
 +  *-amigaos*)
 +    for ac_header in nan.h ieeefp.h endian.h sys/isa_defs.h \
 +      machine/endian.h machine/param.h sys/machine.h sys/types.h \
@@ -3377,1706 +3376,14 @@ index 61457e940ec09c6a2b945a8e290bb038277a6a94..f16bfea81cb0c480488d72c73b2edf5c
 +
 +
 +
-     ;;
++    ;;
    *)
-     as_fn_error "No support for this host/target combination." "$LINENO" 5
+     as_fn_error $? "No support for this host/target combination." "$LINENO" 5
     ;;
  esac
  
-@@ -81941,34 +82100,1678 @@ $as_echo "$gxx_include_dir" >&6; }
- 
- 
-   WARN_FLAGS='-Wall -Wextra -Wwrite-strings -Wcast-qual -Wabi'
- 
- 
- 
--# Determine what GCC version number to use in filesystem paths.
--
--  get_gcc_base_ver="cat"
--
--# Check whether --with-gcc-major-version-only was given.
--if test "${with_gcc_major_version_only+set}" = set; then :
--  withval=$with_gcc_major_version_only; if test x$with_gcc_major_version_only = xyes ; then
--        get_gcc_base_ver="sed -e 's/^\([0-9]*\).*/\1/'"
--      fi
-+# create libtool - libtool > 2.0:
-+: ${CONFIG_LT=./config.lt}
-+{ $as_echo "$as_me:${as_lineno-$LINENO}: creating $CONFIG_LT" >&5
-+$as_echo "$as_me: creating $CONFIG_LT" >&6;}
-+as_write_fail=0
-+cat >"$CONFIG_LT" <<_ASEOF || as_write_fail=1
-+#! $SHELL
-+# Generated by $as_me.
-+# Run this file to recreate a libtool stub with the current configuration.
-+SHELL=\${CONFIG_SHELL-$SHELL}
-+export SHELL
-+_ASEOF
-+cat >>"$CONFIG_LT" <<\_ASEOF || as_write_fail=1
-+## -------------------- ##
-+## M4sh Initialization. ##
-+## -------------------- ##
- 
-+# Be more Bourne compatible
-+DUALCASE=1; export DUALCASE # for MKS sh
-+if test -n "${ZSH_VERSION+set}" && (emulate sh) >/dev/null 2>&1; then :
-+  emulate sh
-+  NULLCMD=:
-+  # Pre-4.2 versions of Zsh do word splitting on ${1+"$@"}, which
-+  # is contrary to our usage.  Disable this feature.
-+  alias -g '${1+"$@"}'='"$@"'
-+  setopt NO_GLOB_SUBST
-+else
-+  case `(set -o) 2>/dev/null` in #(
-+  *posix*) :
-+    set -o posix ;; #(
-+  *) :
-+     ;;
-+esac
- fi
- 
- 
-+as_nl='
-+'
-+export as_nl
-+# Printing a long string crashes Solaris 7 /usr/bin/printf.
-+as_echo='\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\'
-+as_echo=$as_echo$as_echo$as_echo$as_echo$as_echo
-+as_echo=$as_echo$as_echo$as_echo$as_echo$as_echo$as_echo
-+# Prefer a ksh shell builtin over an external printf program on Solaris,
-+# but without wasting forks for bash or zsh.
-+if test -z "$BASH_VERSION$ZSH_VERSION" \
-+    && (test "X`print -r -- $as_echo`" = "X$as_echo") 2>/dev/null; then
-+  as_echo='print -r --'
-+  as_echo_n='print -rn --'
-+elif (test "X`printf %s $as_echo`" = "X$as_echo") 2>/dev/null; then
-+  as_echo='printf %s\n'
-+  as_echo_n='printf %s'
-+else
-+  if test "X`(/usr/ucb/echo -n -n $as_echo) 2>/dev/null`" = "X-n $as_echo"; then
-+    as_echo_body='eval /usr/ucb/echo -n "$1$as_nl"'
-+    as_echo_n='/usr/ucb/echo -n'
-+  else
-+    as_echo_body='eval expr "X$1" : "X\\(.*\\)"'
-+    as_echo_n_body='eval
-+      arg=$1;
-+      case $arg in #(
-+      *"$as_nl"*)
-+	expr "X$arg" : "X\\(.*\\)$as_nl";
-+	arg=`expr "X$arg" : ".*$as_nl\\(.*\\)"`;;
-+      esac;
-+      expr "X$arg" : "X\\(.*\\)" | tr -d "$as_nl"
-+    '
-+    export as_echo_n_body
-+    as_echo_n='sh -c $as_echo_n_body as_echo'
-+  fi
-+  export as_echo_body
-+  as_echo='sh -c $as_echo_body as_echo'
-+fi
- 
-+# The user is always right.
-+if test "${PATH_SEPARATOR+set}" != set; then
-+  PATH_SEPARATOR=:
-+  (PATH='/bin;/bin'; FPATH=$PATH; sh -c :) >/dev/null 2>&1 && {
-+    (PATH='/bin:/bin'; FPATH=$PATH; sh -c :) >/dev/null 2>&1 ||
-+      PATH_SEPARATOR=';'
-+  }
-+fi
- 
--ac_config_files="$ac_config_files Makefile"
--
--ac_config_files="$ac_config_files scripts/testsuite_flags"
- 
--ac_config_files="$ac_config_files scripts/extract_symvers"
-+# IFS
-+# We need space, tab and new line, in precisely that order.  Quoting is
-+# there to prevent editors from complaining about space-tab.
-+# (If _AS_PATH_WALK were called with IFS unset, it would disable word
-+# splitting by setting IFS to empty value.)
-+IFS=" ""	$as_nl"
- 
--ac_config_files="$ac_config_files doc/xsl/customization.xsl"
-+# Find who we are.  Look in the path if we contain no directory separator.
-+case $0 in #((
-+  *[\\/]* ) as_myself=$0 ;;
-+  *) as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
-+for as_dir in $PATH
-+do
-+  IFS=$as_save_IFS
-+  test -z "$as_dir" && as_dir=.
-+    test -r "$as_dir/$0" && as_myself=$as_dir/$0 && break
-+  done
-+IFS=$as_save_IFS
-+
-+     ;;
-+esac
-+# We did not find ourselves, most probably we were run as `sh COMMAND'
-+# in which case we are not to be found in the path.
-+if test "x$as_myself" = x; then
-+  as_myself=$0
-+fi
-+if test ! -f "$as_myself"; then
-+  $as_echo "$as_myself: error: cannot find myself; rerun with an absolute file name" >&2
-+  exit 1
-+fi
-+
-+# Unset variables that we do not need and which cause bugs (e.g. in
-+# pre-3.0 UWIN ksh).  But do not cause bugs in bash 2.01; the "|| exit 1"
-+# suppresses any "Segmentation fault" message there.  '((' could
-+# trigger a bug in pdksh 5.2.14.
-+for as_var in BASH_ENV ENV MAIL MAILPATH
-+do eval test x\${$as_var+set} = xset \
-+  && ( (unset $as_var) || exit 1) >/dev/null 2>&1 && unset $as_var || :
-+done
-+PS1='$ '
-+PS2='> '
-+PS4='+ '
-+
-+# NLS nuisances.
-+LC_ALL=C
-+export LC_ALL
-+LANGUAGE=C
-+export LANGUAGE
-+
-+# CDPATH.
-+(unset CDPATH) >/dev/null 2>&1 && unset CDPATH
-+
-+
-+# as_fn_error ERROR [LINENO LOG_FD]
-+# ---------------------------------
-+# Output "`basename $0`: error: ERROR" to stderr. If LINENO and LOG_FD are
-+# provided, also output the error to LOG_FD, referencing LINENO. Then exit the
-+# script with status $?, using 1 if that was 0.
-+as_fn_error ()
-+{
-+  as_status=$?; test $as_status -eq 0 && as_status=1
-+  if test "$3"; then
-+    as_lineno=${as_lineno-"$2"} as_lineno_stack=as_lineno_stack=$as_lineno_stack
-+    $as_echo "$as_me:${as_lineno-$LINENO}: error: $1" >&$3
-+  fi
-+  $as_echo "$as_me: error: $1" >&2
-+  as_fn_exit $as_status
-+} # as_fn_error
-+
-+
-+# as_fn_set_status STATUS
-+# -----------------------
-+# Set $? to STATUS, without forking.
-+as_fn_set_status ()
-+{
-+  return $1
-+} # as_fn_set_status
-+
-+# as_fn_exit STATUS
-+# -----------------
-+# Exit the shell with STATUS, even in a "trap 0" or "set -e" context.
-+as_fn_exit ()
-+{
-+  set +e
-+  as_fn_set_status $1
-+  exit $1
-+} # as_fn_exit
-+
-+# as_fn_unset VAR
-+# ---------------
-+# Portably unset VAR.
-+as_fn_unset ()
-+{
-+  { eval $1=; unset $1;}
-+}
-+as_unset=as_fn_unset
-+# as_fn_append VAR VALUE
-+# ----------------------
-+# Append the text in VALUE to the end of the definition contained in VAR. Take
-+# advantage of any shell optimizations that allow amortized linear growth over
-+# repeated appends, instead of the typical quadratic growth present in naive
-+# implementations.
-+if (eval "as_var=1; as_var+=2; test x\$as_var = x12") 2>/dev/null; then :
-+  eval 'as_fn_append ()
-+  {
-+    eval $1+=\$2
-+  }'
-+else
-+  as_fn_append ()
-+  {
-+    eval $1=\$$1\$2
-+  }
-+fi # as_fn_append
-+
-+# as_fn_arith ARG...
-+# ------------------
-+# Perform arithmetic evaluation on the ARGs, and store the result in the
-+# global $as_val. Take advantage of shells that can avoid forks. The arguments
-+# must be portable across $(()) and expr.
-+if (eval "test \$(( 1 + 1 )) = 2") 2>/dev/null; then :
-+  eval 'as_fn_arith ()
-+  {
-+    as_val=$(( $* ))
-+  }'
-+else
-+  as_fn_arith ()
-+  {
-+    as_val=`expr "$@" || test $? -eq 1`
-+  }
-+fi # as_fn_arith
-+
-+
-+if expr a : '\(a\)' >/dev/null 2>&1 &&
-+   test "X`expr 00001 : '.*\(...\)'`" = X001; then
-+  as_expr=expr
-+else
-+  as_expr=false
-+fi
-+
-+if (basename -- /) >/dev/null 2>&1 && test "X`basename -- / 2>&1`" = "X/"; then
-+  as_basename=basename
-+else
-+  as_basename=false
-+fi
-+
-+if (as_dir=`dirname -- /` && test "X$as_dir" = X/) >/dev/null 2>&1; then
-+  as_dirname=dirname
-+else
-+  as_dirname=false
-+fi
-+
-+as_me=`$as_basename -- "$0" ||
-+$as_expr X/"$0" : '.*/\([^/][^/]*\)/*$' \| \
-+	 X"$0" : 'X\(//\)$' \| \
-+	 X"$0" : 'X\(/\)' \| . 2>/dev/null ||
-+$as_echo X/"$0" |
-+    sed '/^.*\/\([^/][^/]*\)\/*$/{
-+	    s//\1/
-+	    q
-+	  }
-+	  /^X\/\(\/\/\)$/{
-+	    s//\1/
-+	    q
-+	  }
-+	  /^X\/\(\/\).*/{
-+	    s//\1/
-+	    q
-+	  }
-+	  s/.*/./; q'`
-+
-+# Avoid depending upon Character Ranges.
-+as_cr_letters='abcdefghijklmnopqrstuvwxyz'
-+as_cr_LETTERS='ABCDEFGHIJKLMNOPQRSTUVWXYZ'
-+as_cr_Letters=$as_cr_letters$as_cr_LETTERS
-+as_cr_digits='0123456789'
-+as_cr_alnum=$as_cr_Letters$as_cr_digits
-+
-+ECHO_C= ECHO_N= ECHO_T=
-+case `echo -n x` in #(((((
-+-n*)
-+  case `echo 'xy\c'` in
-+  *c*) ECHO_T='	';;	# ECHO_T is single tab character.
-+  xy)  ECHO_C='\c';;
-+  *)   echo `echo ksh88 bug on AIX 6.1` > /dev/null
-+       ECHO_T='	';;
-+  esac;;
-+*)
-+  ECHO_N='-n';;
-+esac
-+
-+rm -f conf$$ conf$$.exe conf$$.file
-+if test -d conf$$.dir; then
-+  rm -f conf$$.dir/conf$$.file
-+else
-+  rm -f conf$$.dir
-+  mkdir conf$$.dir 2>/dev/null
-+fi
-+if (echo >conf$$.file) 2>/dev/null; then
-+  if ln -s conf$$.file conf$$ 2>/dev/null; then
-+    as_ln_s='ln -s'
-+    # ... but there are two gotchas:
-+    # 1) On MSYS, both `ln -s file dir' and `ln file dir' fail.
-+    # 2) DJGPP < 2.04 has no symlinks; `ln -s' creates a wrapper executable.
-+    # In both cases, we have to default to `cp -p'.
-+    ln -s conf$$.file conf$$.dir 2>/dev/null && test ! -f conf$$.exe ||
-+      as_ln_s='cp -p'
-+  elif ln conf$$.file conf$$ 2>/dev/null; then
-+    as_ln_s=ln
-+  else
-+    as_ln_s='cp -p'
-+  fi
-+else
-+  as_ln_s='cp -p'
-+fi
-+rm -f conf$$ conf$$.exe conf$$.dir/conf$$.file conf$$.file
-+rmdir conf$$.dir 2>/dev/null
-+
-+
-+# as_fn_mkdir_p
-+# -------------
-+# Create "$as_dir" as a directory, including parents if necessary.
-+as_fn_mkdir_p ()
-+{
-+
-+  case $as_dir in #(
-+  -*) as_dir=./$as_dir;;
-+  esac
-+  test -d "$as_dir" || eval $as_mkdir_p || {
-+    as_dirs=
-+    while :; do
-+      case $as_dir in #(
-+      *\'*) as_qdir=`$as_echo "$as_dir" | sed "s/'/'\\\\\\\\''/g"`;; #'(
-+      *) as_qdir=$as_dir;;
-+      esac
-+      as_dirs="'$as_qdir' $as_dirs"
-+      as_dir=`$as_dirname -- "$as_dir" ||
-+$as_expr X"$as_dir" : 'X\(.*[^/]\)//*[^/][^/]*/*$' \| \
-+	 X"$as_dir" : 'X\(//\)[^/]' \| \
-+	 X"$as_dir" : 'X\(//\)$' \| \
-+	 X"$as_dir" : 'X\(/\)' \| . 2>/dev/null ||
-+$as_echo X"$as_dir" |
-+    sed '/^X\(.*[^/]\)\/\/*[^/][^/]*\/*$/{
-+	    s//\1/
-+	    q
-+	  }
-+	  /^X\(\/\/\)[^/].*/{
-+	    s//\1/
-+	    q
-+	  }
-+	  /^X\(\/\/\)$/{
-+	    s//\1/
-+	    q
-+	  }
-+	  /^X\(\/\).*/{
-+	    s//\1/
-+	    q
-+	  }
-+	  s/.*/./; q'`
-+      test -d "$as_dir" && break
-+    done
-+    test -z "$as_dirs" || eval "mkdir $as_dirs"
-+  } || test -d "$as_dir" || as_fn_error "cannot create directory $as_dir"
-+
-+
-+} # as_fn_mkdir_p
-+if mkdir -p . 2>/dev/null; then
-+  as_mkdir_p='mkdir -p "$as_dir"'
-+else
-+  test -d ./-p && rmdir ./-p
-+  as_mkdir_p=false
-+fi
-+
-+if test -x / >/dev/null 2>&1; then
-+  as_test_x='test -x'
-+else
-+  if ls -dL / >/dev/null 2>&1; then
-+    as_ls_L_option=L
-+  else
-+    as_ls_L_option=
-+  fi
-+  as_test_x='
-+    eval sh -c '\''
-+      if test -d "$1"; then
-+	test -d "$1/.";
-+      else
-+	case $1 in #(
-+	-*)set "./$1";;
-+	esac;
-+	case `ls -ld'$as_ls_L_option' "$1" 2>/dev/null` in #((
-+	???[sx]*):;;*)false;;esac;fi
-+    '\'' sh
-+  '
-+fi
-+as_executable_p=$as_test_x
-+
-+# Sed expression to map a string onto a valid CPP name.
-+as_tr_cpp="eval sed 'y%*$as_cr_letters%P$as_cr_LETTERS%;s%[^_$as_cr_alnum]%_%g'"
-+
-+# Sed expression to map a string onto a valid variable name.
-+as_tr_sh="eval sed 'y%*+%pp%;s%[^_$as_cr_alnum]%_%g'"
-+
-+
-+exec 6>&1
-+## --------------------------------- ##
-+## Main body of "$CONFIG_LT" script. ##
-+## --------------------------------- ##
-+_ASEOF
-+test $as_write_fail = 0 && chmod +x "$CONFIG_LT"
-+
-+cat >>"$CONFIG_LT" <<\_LTEOF
-+lt_cl_silent=false
-+exec 5>>config.log
-+{
-+  echo
-+  sed 'h;s/./-/g;s/^.../## /;s/...$/ ##/;p;x;p;x' <<_ASBOX
-+## Running $as_me. ##
-+_ASBOX
-+} >&5
-+
-+lt_cl_help="\
-+\`$as_me' creates a local libtool stub from the current configuration,
-+for use in further configure time tests before the real libtool is
-+generated.
-+
-+Usage: $0 [OPTIONS]
-+
-+  -h, --help      print this help, then exit
-+  -V, --version   print version number, then exit
-+  -q, --quiet     do not print progress messages
-+  -d, --debug     don't remove temporary files
-+
-+Report bugs to <bug-libtool@gnu.org>."
-+
-+lt_cl_version="\
-+package-unused config.lt version-unused
-+configured by $0, generated by GNU Autoconf 2.64.
-+
-+Copyright (C) 2009 Free Software Foundation, Inc.
-+This config.lt script is free software; the Free Software Foundation
-+gives unlimited permision to copy, distribute and modify it."
-+
-+while test $# != 0
-+do
-+  case $1 in
-+    --version | --v* | -V )
-+      echo "$lt_cl_version"; exit 0 ;;
-+    --help | --h* | -h )
-+      echo "$lt_cl_help"; exit 0 ;;
-+    --debug | --d* | -d )
-+      debug=: ;;
-+    --quiet | --q* | --silent | --s* | -q )
-+      lt_cl_silent=: ;;
-+
-+    -*) as_fn_error "unrecognized option: $1
-+Try \`$0 --help' for more information." "$LINENO" 5 ;;
-+
-+    *) as_fn_error "unrecognized argument: $1
-+Try \`$0 --help' for more information." "$LINENO" 5 ;;
-+  esac
-+  shift
-+done
-+
-+if $lt_cl_silent; then
-+  exec 6>/dev/null
-+fi
-+_LTEOF
-+
-+cat >>"$CONFIG_LT" <<_LTEOF
-+
-+
-+# The HP-UX ksh and POSIX shell print the target directory to stdout
-+# if CDPATH is set.
-+(unset CDPATH) >/dev/null 2>&1 && unset CDPATH
-+
-+sed_quote_subst='$sed_quote_subst'
-+double_quote_subst='$double_quote_subst'
-+delay_variable_subst='$delay_variable_subst'
-+macro_version='`$ECHO "$macro_version" | $SED "$delay_single_quote_subst"`'
-+macro_revision='`$ECHO "$macro_revision" | $SED "$delay_single_quote_subst"`'
-+enable_shared='`$ECHO "$enable_shared" | $SED "$delay_single_quote_subst"`'
-+enable_static='`$ECHO "$enable_static" | $SED "$delay_single_quote_subst"`'
-+pic_mode='`$ECHO "$pic_mode" | $SED "$delay_single_quote_subst"`'
-+enable_fast_install='`$ECHO "$enable_fast_install" | $SED "$delay_single_quote_subst"`'
-+SHELL='`$ECHO "$SHELL" | $SED "$delay_single_quote_subst"`'
-+ECHO='`$ECHO "$ECHO" | $SED "$delay_single_quote_subst"`'
-+host_alias='`$ECHO "$host_alias" | $SED "$delay_single_quote_subst"`'
-+host='`$ECHO "$host" | $SED "$delay_single_quote_subst"`'
-+host_os='`$ECHO "$host_os" | $SED "$delay_single_quote_subst"`'
-+build_alias='`$ECHO "$build_alias" | $SED "$delay_single_quote_subst"`'
-+build='`$ECHO "$build" | $SED "$delay_single_quote_subst"`'
-+build_os='`$ECHO "$build_os" | $SED "$delay_single_quote_subst"`'
-+SED='`$ECHO "$SED" | $SED "$delay_single_quote_subst"`'
-+Xsed='`$ECHO "$Xsed" | $SED "$delay_single_quote_subst"`'
-+GREP='`$ECHO "$GREP" | $SED "$delay_single_quote_subst"`'
-+EGREP='`$ECHO "$EGREP" | $SED "$delay_single_quote_subst"`'
-+FGREP='`$ECHO "$FGREP" | $SED "$delay_single_quote_subst"`'
-+LD='`$ECHO "$LD" | $SED "$delay_single_quote_subst"`'
-+NM='`$ECHO "$NM" | $SED "$delay_single_quote_subst"`'
-+LN_S='`$ECHO "$LN_S" | $SED "$delay_single_quote_subst"`'
-+max_cmd_len='`$ECHO "$max_cmd_len" | $SED "$delay_single_quote_subst"`'
-+ac_objext='`$ECHO "$ac_objext" | $SED "$delay_single_quote_subst"`'
-+exeext='`$ECHO "$exeext" | $SED "$delay_single_quote_subst"`'
-+lt_unset='`$ECHO "$lt_unset" | $SED "$delay_single_quote_subst"`'
-+lt_SP2NL='`$ECHO "$lt_SP2NL" | $SED "$delay_single_quote_subst"`'
-+lt_NL2SP='`$ECHO "$lt_NL2SP" | $SED "$delay_single_quote_subst"`'
-+reload_flag='`$ECHO "$reload_flag" | $SED "$delay_single_quote_subst"`'
-+reload_cmds='`$ECHO "$reload_cmds" | $SED "$delay_single_quote_subst"`'
-+OBJDUMP='`$ECHO "$OBJDUMP" | $SED "$delay_single_quote_subst"`'
-+deplibs_check_method='`$ECHO "$deplibs_check_method" | $SED "$delay_single_quote_subst"`'
-+file_magic_cmd='`$ECHO "$file_magic_cmd" | $SED "$delay_single_quote_subst"`'
-+AR='`$ECHO "$AR" | $SED "$delay_single_quote_subst"`'
-+AR_FLAGS='`$ECHO "$AR_FLAGS" | $SED "$delay_single_quote_subst"`'
-+STRIP='`$ECHO "$STRIP" | $SED "$delay_single_quote_subst"`'
-+RANLIB='`$ECHO "$RANLIB" | $SED "$delay_single_quote_subst"`'
-+old_postinstall_cmds='`$ECHO "$old_postinstall_cmds" | $SED "$delay_single_quote_subst"`'
-+old_postuninstall_cmds='`$ECHO "$old_postuninstall_cmds" | $SED "$delay_single_quote_subst"`'
-+old_archive_cmds='`$ECHO "$old_archive_cmds" | $SED "$delay_single_quote_subst"`'
-+lock_old_archive_extraction='`$ECHO "$lock_old_archive_extraction" | $SED "$delay_single_quote_subst"`'
-+CC='`$ECHO "$CC" | $SED "$delay_single_quote_subst"`'
-+CFLAGS='`$ECHO "$CFLAGS" | $SED "$delay_single_quote_subst"`'
-+compiler='`$ECHO "$compiler" | $SED "$delay_single_quote_subst"`'
-+GCC='`$ECHO "$GCC" | $SED "$delay_single_quote_subst"`'
-+lt_cv_sys_global_symbol_pipe='`$ECHO "$lt_cv_sys_global_symbol_pipe" | $SED "$delay_single_quote_subst"`'
-+lt_cv_sys_global_symbol_to_cdecl='`$ECHO "$lt_cv_sys_global_symbol_to_cdecl" | $SED "$delay_single_quote_subst"`'
-+lt_cv_sys_global_symbol_to_c_name_address='`$ECHO "$lt_cv_sys_global_symbol_to_c_name_address" | $SED "$delay_single_quote_subst"`'
-+lt_cv_sys_global_symbol_to_c_name_address_lib_prefix='`$ECHO "$lt_cv_sys_global_symbol_to_c_name_address_lib_prefix" | $SED "$delay_single_quote_subst"`'
-+objdir='`$ECHO "$objdir" | $SED "$delay_single_quote_subst"`'
-+MAGIC_CMD='`$ECHO "$MAGIC_CMD" | $SED "$delay_single_quote_subst"`'
-+lt_prog_compiler_no_builtin_flag='`$ECHO "$lt_prog_compiler_no_builtin_flag" | $SED "$delay_single_quote_subst"`'
-+lt_prog_compiler_wl='`$ECHO "$lt_prog_compiler_wl" | $SED "$delay_single_quote_subst"`'
-+lt_prog_compiler_pic='`$ECHO "$lt_prog_compiler_pic" | $SED "$delay_single_quote_subst"`'
-+lt_prog_compiler_static='`$ECHO "$lt_prog_compiler_static" | $SED "$delay_single_quote_subst"`'
-+lt_cv_prog_compiler_c_o='`$ECHO "$lt_cv_prog_compiler_c_o" | $SED "$delay_single_quote_subst"`'
-+need_locks='`$ECHO "$need_locks" | $SED "$delay_single_quote_subst"`'
-+DSYMUTIL='`$ECHO "$DSYMUTIL" | $SED "$delay_single_quote_subst"`'
-+NMEDIT='`$ECHO "$NMEDIT" | $SED "$delay_single_quote_subst"`'
-+LIPO='`$ECHO "$LIPO" | $SED "$delay_single_quote_subst"`'
-+OTOOL='`$ECHO "$OTOOL" | $SED "$delay_single_quote_subst"`'
-+OTOOL64='`$ECHO "$OTOOL64" | $SED "$delay_single_quote_subst"`'
-+libext='`$ECHO "$libext" | $SED "$delay_single_quote_subst"`'
-+shrext_cmds='`$ECHO "$shrext_cmds" | $SED "$delay_single_quote_subst"`'
-+extract_expsyms_cmds='`$ECHO "$extract_expsyms_cmds" | $SED "$delay_single_quote_subst"`'
-+archive_cmds_need_lc='`$ECHO "$archive_cmds_need_lc" | $SED "$delay_single_quote_subst"`'
-+enable_shared_with_static_runtimes='`$ECHO "$enable_shared_with_static_runtimes" | $SED "$delay_single_quote_subst"`'
-+export_dynamic_flag_spec='`$ECHO "$export_dynamic_flag_spec" | $SED "$delay_single_quote_subst"`'
-+whole_archive_flag_spec='`$ECHO "$whole_archive_flag_spec" | $SED "$delay_single_quote_subst"`'
-+compiler_needs_object='`$ECHO "$compiler_needs_object" | $SED "$delay_single_quote_subst"`'
-+old_archive_from_new_cmds='`$ECHO "$old_archive_from_new_cmds" | $SED "$delay_single_quote_subst"`'
-+old_archive_from_expsyms_cmds='`$ECHO "$old_archive_from_expsyms_cmds" | $SED "$delay_single_quote_subst"`'
-+archive_cmds='`$ECHO "$archive_cmds" | $SED "$delay_single_quote_subst"`'
-+archive_expsym_cmds='`$ECHO "$archive_expsym_cmds" | $SED "$delay_single_quote_subst"`'
-+module_cmds='`$ECHO "$module_cmds" | $SED "$delay_single_quote_subst"`'
-+module_expsym_cmds='`$ECHO "$module_expsym_cmds" | $SED "$delay_single_quote_subst"`'
-+with_gnu_ld='`$ECHO "$with_gnu_ld" | $SED "$delay_single_quote_subst"`'
-+allow_undefined_flag='`$ECHO "$allow_undefined_flag" | $SED "$delay_single_quote_subst"`'
-+no_undefined_flag='`$ECHO "$no_undefined_flag" | $SED "$delay_single_quote_subst"`'
-+hardcode_libdir_flag_spec='`$ECHO "$hardcode_libdir_flag_spec" | $SED "$delay_single_quote_subst"`'
-+hardcode_libdir_flag_spec_ld='`$ECHO "$hardcode_libdir_flag_spec_ld" | $SED "$delay_single_quote_subst"`'
-+hardcode_libdir_separator='`$ECHO "$hardcode_libdir_separator" | $SED "$delay_single_quote_subst"`'
-+hardcode_direct='`$ECHO "$hardcode_direct" | $SED "$delay_single_quote_subst"`'
-+hardcode_direct_absolute='`$ECHO "$hardcode_direct_absolute" | $SED "$delay_single_quote_subst"`'
-+hardcode_minus_L='`$ECHO "$hardcode_minus_L" | $SED "$delay_single_quote_subst"`'
-+hardcode_shlibpath_var='`$ECHO "$hardcode_shlibpath_var" | $SED "$delay_single_quote_subst"`'
-+hardcode_automatic='`$ECHO "$hardcode_automatic" | $SED "$delay_single_quote_subst"`'
-+inherit_rpath='`$ECHO "$inherit_rpath" | $SED "$delay_single_quote_subst"`'
-+link_all_deplibs='`$ECHO "$link_all_deplibs" | $SED "$delay_single_quote_subst"`'
-+fix_srcfile_path='`$ECHO "$fix_srcfile_path" | $SED "$delay_single_quote_subst"`'
-+always_export_symbols='`$ECHO "$always_export_symbols" | $SED "$delay_single_quote_subst"`'
-+export_symbols_cmds='`$ECHO "$export_symbols_cmds" | $SED "$delay_single_quote_subst"`'
-+exclude_expsyms='`$ECHO "$exclude_expsyms" | $SED "$delay_single_quote_subst"`'
-+include_expsyms='`$ECHO "$include_expsyms" | $SED "$delay_single_quote_subst"`'
-+prelink_cmds='`$ECHO "$prelink_cmds" | $SED "$delay_single_quote_subst"`'
-+file_list_spec='`$ECHO "$file_list_spec" | $SED "$delay_single_quote_subst"`'
-+variables_saved_for_relink='`$ECHO "$variables_saved_for_relink" | $SED "$delay_single_quote_subst"`'
-+need_lib_prefix='`$ECHO "$need_lib_prefix" | $SED "$delay_single_quote_subst"`'
-+need_version='`$ECHO "$need_version" | $SED "$delay_single_quote_subst"`'
-+version_type='`$ECHO "$version_type" | $SED "$delay_single_quote_subst"`'
-+runpath_var='`$ECHO "$runpath_var" | $SED "$delay_single_quote_subst"`'
-+shlibpath_var='`$ECHO "$shlibpath_var" | $SED "$delay_single_quote_subst"`'
-+shlibpath_overrides_runpath='`$ECHO "$shlibpath_overrides_runpath" | $SED "$delay_single_quote_subst"`'
-+libname_spec='`$ECHO "$libname_spec" | $SED "$delay_single_quote_subst"`'
-+library_names_spec='`$ECHO "$library_names_spec" | $SED "$delay_single_quote_subst"`'
-+soname_spec='`$ECHO "$soname_spec" | $SED "$delay_single_quote_subst"`'
-+install_override_mode='`$ECHO "$install_override_mode" | $SED "$delay_single_quote_subst"`'
-+postinstall_cmds='`$ECHO "$postinstall_cmds" | $SED "$delay_single_quote_subst"`'
-+postuninstall_cmds='`$ECHO "$postuninstall_cmds" | $SED "$delay_single_quote_subst"`'
-+finish_cmds='`$ECHO "$finish_cmds" | $SED "$delay_single_quote_subst"`'
-+finish_eval='`$ECHO "$finish_eval" | $SED "$delay_single_quote_subst"`'
-+hardcode_into_libs='`$ECHO "$hardcode_into_libs" | $SED "$delay_single_quote_subst"`'
-+sys_lib_search_path_spec='`$ECHO "$sys_lib_search_path_spec" | $SED "$delay_single_quote_subst"`'
-+sys_lib_dlsearch_path_spec='`$ECHO "$sys_lib_dlsearch_path_spec" | $SED "$delay_single_quote_subst"`'
-+hardcode_action='`$ECHO "$hardcode_action" | $SED "$delay_single_quote_subst"`'
-+enable_dlopen='`$ECHO "$enable_dlopen" | $SED "$delay_single_quote_subst"`'
-+enable_dlopen_self='`$ECHO "$enable_dlopen_self" | $SED "$delay_single_quote_subst"`'
-+enable_dlopen_self_static='`$ECHO "$enable_dlopen_self_static" | $SED "$delay_single_quote_subst"`'
-+old_striplib='`$ECHO "$old_striplib" | $SED "$delay_single_quote_subst"`'
-+striplib='`$ECHO "$striplib" | $SED "$delay_single_quote_subst"`'
-+compiler_lib_search_dirs='`$ECHO "$compiler_lib_search_dirs" | $SED "$delay_single_quote_subst"`'
-+predep_objects='`$ECHO "$predep_objects" | $SED "$delay_single_quote_subst"`'
-+postdep_objects='`$ECHO "$postdep_objects" | $SED "$delay_single_quote_subst"`'
-+predeps='`$ECHO "$predeps" | $SED "$delay_single_quote_subst"`'
-+postdeps='`$ECHO "$postdeps" | $SED "$delay_single_quote_subst"`'
-+compiler_lib_search_path='`$ECHO "$compiler_lib_search_path" | $SED "$delay_single_quote_subst"`'
-+LD_CXX='`$ECHO "$LD_CXX" | $SED "$delay_single_quote_subst"`'
-+reload_flag_CXX='`$ECHO "$reload_flag_CXX" | $SED "$delay_single_quote_subst"`'
-+reload_cmds_CXX='`$ECHO "$reload_cmds_CXX" | $SED "$delay_single_quote_subst"`'
-+old_archive_cmds_CXX='`$ECHO "$old_archive_cmds_CXX" | $SED "$delay_single_quote_subst"`'
-+compiler_CXX='`$ECHO "$compiler_CXX" | $SED "$delay_single_quote_subst"`'
-+GCC_CXX='`$ECHO "$GCC_CXX" | $SED "$delay_single_quote_subst"`'
-+lt_prog_compiler_no_builtin_flag_CXX='`$ECHO "$lt_prog_compiler_no_builtin_flag_CXX" | $SED "$delay_single_quote_subst"`'
-+lt_prog_compiler_wl_CXX='`$ECHO "$lt_prog_compiler_wl_CXX" | $SED "$delay_single_quote_subst"`'
-+lt_prog_compiler_pic_CXX='`$ECHO "$lt_prog_compiler_pic_CXX" | $SED "$delay_single_quote_subst"`'
-+lt_prog_compiler_static_CXX='`$ECHO "$lt_prog_compiler_static_CXX" | $SED "$delay_single_quote_subst"`'
-+lt_cv_prog_compiler_c_o_CXX='`$ECHO "$lt_cv_prog_compiler_c_o_CXX" | $SED "$delay_single_quote_subst"`'
-+archive_cmds_need_lc_CXX='`$ECHO "$archive_cmds_need_lc_CXX" | $SED "$delay_single_quote_subst"`'
-+enable_shared_with_static_runtimes_CXX='`$ECHO "$enable_shared_with_static_runtimes_CXX" | $SED "$delay_single_quote_subst"`'
-+export_dynamic_flag_spec_CXX='`$ECHO "$export_dynamic_flag_spec_CXX" | $SED "$delay_single_quote_subst"`'
-+whole_archive_flag_spec_CXX='`$ECHO "$whole_archive_flag_spec_CXX" | $SED "$delay_single_quote_subst"`'
-+compiler_needs_object_CXX='`$ECHO "$compiler_needs_object_CXX" | $SED "$delay_single_quote_subst"`'
-+old_archive_from_new_cmds_CXX='`$ECHO "$old_archive_from_new_cmds_CXX" | $SED "$delay_single_quote_subst"`'
-+old_archive_from_expsyms_cmds_CXX='`$ECHO "$old_archive_from_expsyms_cmds_CXX" | $SED "$delay_single_quote_subst"`'
-+archive_cmds_CXX='`$ECHO "$archive_cmds_CXX" | $SED "$delay_single_quote_subst"`'
-+archive_expsym_cmds_CXX='`$ECHO "$archive_expsym_cmds_CXX" | $SED "$delay_single_quote_subst"`'
-+module_cmds_CXX='`$ECHO "$module_cmds_CXX" | $SED "$delay_single_quote_subst"`'
-+module_expsym_cmds_CXX='`$ECHO "$module_expsym_cmds_CXX" | $SED "$delay_single_quote_subst"`'
-+with_gnu_ld_CXX='`$ECHO "$with_gnu_ld_CXX" | $SED "$delay_single_quote_subst"`'
-+allow_undefined_flag_CXX='`$ECHO "$allow_undefined_flag_CXX" | $SED "$delay_single_quote_subst"`'
-+no_undefined_flag_CXX='`$ECHO "$no_undefined_flag_CXX" | $SED "$delay_single_quote_subst"`'
-+hardcode_libdir_flag_spec_CXX='`$ECHO "$hardcode_libdir_flag_spec_CXX" | $SED "$delay_single_quote_subst"`'
-+hardcode_libdir_flag_spec_ld_CXX='`$ECHO "$hardcode_libdir_flag_spec_ld_CXX" | $SED "$delay_single_quote_subst"`'
-+hardcode_libdir_separator_CXX='`$ECHO "$hardcode_libdir_separator_CXX" | $SED "$delay_single_quote_subst"`'
-+hardcode_direct_CXX='`$ECHO "$hardcode_direct_CXX" | $SED "$delay_single_quote_subst"`'
-+hardcode_direct_absolute_CXX='`$ECHO "$hardcode_direct_absolute_CXX" | $SED "$delay_single_quote_subst"`'
-+hardcode_minus_L_CXX='`$ECHO "$hardcode_minus_L_CXX" | $SED "$delay_single_quote_subst"`'
-+hardcode_shlibpath_var_CXX='`$ECHO "$hardcode_shlibpath_var_CXX" | $SED "$delay_single_quote_subst"`'
-+hardcode_automatic_CXX='`$ECHO "$hardcode_automatic_CXX" | $SED "$delay_single_quote_subst"`'
-+inherit_rpath_CXX='`$ECHO "$inherit_rpath_CXX" | $SED "$delay_single_quote_subst"`'
-+link_all_deplibs_CXX='`$ECHO "$link_all_deplibs_CXX" | $SED "$delay_single_quote_subst"`'
-+fix_srcfile_path_CXX='`$ECHO "$fix_srcfile_path_CXX" | $SED "$delay_single_quote_subst"`'
-+always_export_symbols_CXX='`$ECHO "$always_export_symbols_CXX" | $SED "$delay_single_quote_subst"`'
-+export_symbols_cmds_CXX='`$ECHO "$export_symbols_cmds_CXX" | $SED "$delay_single_quote_subst"`'
-+exclude_expsyms_CXX='`$ECHO "$exclude_expsyms_CXX" | $SED "$delay_single_quote_subst"`'
-+include_expsyms_CXX='`$ECHO "$include_expsyms_CXX" | $SED "$delay_single_quote_subst"`'
-+prelink_cmds_CXX='`$ECHO "$prelink_cmds_CXX" | $SED "$delay_single_quote_subst"`'
-+file_list_spec_CXX='`$ECHO "$file_list_spec_CXX" | $SED "$delay_single_quote_subst"`'
-+hardcode_action_CXX='`$ECHO "$hardcode_action_CXX" | $SED "$delay_single_quote_subst"`'
-+compiler_lib_search_dirs_CXX='`$ECHO "$compiler_lib_search_dirs_CXX" | $SED "$delay_single_quote_subst"`'
-+predep_objects_CXX='`$ECHO "$predep_objects_CXX" | $SED "$delay_single_quote_subst"`'
-+postdep_objects_CXX='`$ECHO "$postdep_objects_CXX" | $SED "$delay_single_quote_subst"`'
-+predeps_CXX='`$ECHO "$predeps_CXX" | $SED "$delay_single_quote_subst"`'
-+postdeps_CXX='`$ECHO "$postdeps_CXX" | $SED "$delay_single_quote_subst"`'
-+compiler_lib_search_path_CXX='`$ECHO "$compiler_lib_search_path_CXX" | $SED "$delay_single_quote_subst"`'
-+
-+LTCC='$LTCC'
-+LTCFLAGS='$LTCFLAGS'
-+compiler='$compiler_DEFAULT'
-+
-+# A function that is used when there is no print builtin or printf.
-+func_fallback_echo ()
-+{
-+  eval 'cat <<_LTECHO_EOF
-+\$1
-+_LTECHO_EOF'
-+}
-+
-+# Quote evaled strings.
-+for var in SHELL \
-+ECHO \
-+SED \
-+GREP \
-+EGREP \
-+FGREP \
-+LD \
-+NM \
-+LN_S \
-+lt_SP2NL \
-+lt_NL2SP \
-+reload_flag \
-+OBJDUMP \
-+deplibs_check_method \
-+file_magic_cmd \
-+AR \
-+AR_FLAGS \
-+STRIP \
-+RANLIB \
-+CC \
-+CFLAGS \
-+compiler \
-+lt_cv_sys_global_symbol_pipe \
-+lt_cv_sys_global_symbol_to_cdecl \
-+lt_cv_sys_global_symbol_to_c_name_address \
-+lt_cv_sys_global_symbol_to_c_name_address_lib_prefix \
-+lt_prog_compiler_no_builtin_flag \
-+lt_prog_compiler_wl \
-+lt_prog_compiler_pic \
-+lt_prog_compiler_static \
-+lt_cv_prog_compiler_c_o \
-+need_locks \
-+DSYMUTIL \
-+NMEDIT \
-+LIPO \
-+OTOOL \
-+OTOOL64 \
-+shrext_cmds \
-+export_dynamic_flag_spec \
-+whole_archive_flag_spec \
-+compiler_needs_object \
-+with_gnu_ld \
-+allow_undefined_flag \
-+no_undefined_flag \
-+hardcode_libdir_flag_spec \
-+hardcode_libdir_flag_spec_ld \
-+hardcode_libdir_separator \
-+fix_srcfile_path \
-+exclude_expsyms \
-+include_expsyms \
-+file_list_spec \
-+variables_saved_for_relink \
-+libname_spec \
-+library_names_spec \
-+soname_spec \
-+install_override_mode \
-+finish_eval \
-+old_striplib \
-+striplib \
-+compiler_lib_search_dirs \
-+predep_objects \
-+postdep_objects \
-+predeps \
-+postdeps \
-+compiler_lib_search_path \
-+LD_CXX \
-+reload_flag_CXX \
-+compiler_CXX \
-+lt_prog_compiler_no_builtin_flag_CXX \
-+lt_prog_compiler_wl_CXX \
-+lt_prog_compiler_pic_CXX \
-+lt_prog_compiler_static_CXX \
-+lt_cv_prog_compiler_c_o_CXX \
-+export_dynamic_flag_spec_CXX \
-+whole_archive_flag_spec_CXX \
-+compiler_needs_object_CXX \
-+with_gnu_ld_CXX \
-+allow_undefined_flag_CXX \
-+no_undefined_flag_CXX \
-+hardcode_libdir_flag_spec_CXX \
-+hardcode_libdir_flag_spec_ld_CXX \
-+hardcode_libdir_separator_CXX \
-+fix_srcfile_path_CXX \
-+exclude_expsyms_CXX \
-+include_expsyms_CXX \
-+file_list_spec_CXX \
-+compiler_lib_search_dirs_CXX \
-+predep_objects_CXX \
-+postdep_objects_CXX \
-+predeps_CXX \
-+postdeps_CXX \
-+compiler_lib_search_path_CXX; do
-+    case \`eval \\\\\$ECHO \\\\""\\\\\$\$var"\\\\"\` in
-+    *[\\\\\\\`\\"\\\$]*)
-+      eval "lt_\$var=\\\\\\"\\\`\\\$ECHO \\"\\\$\$var\\" | \\\$SED \\"\\\$sed_quote_subst\\"\\\`\\\\\\""
-+      ;;
-+    *)
-+      eval "lt_\$var=\\\\\\"\\\$\$var\\\\\\""
-+      ;;
-+    esac
-+done
-+
-+# Double-quote double-evaled strings.
-+for var in reload_cmds \
-+old_postinstall_cmds \
-+old_postuninstall_cmds \
-+old_archive_cmds \
-+extract_expsyms_cmds \
-+old_archive_from_new_cmds \
-+old_archive_from_expsyms_cmds \
-+archive_cmds \
-+archive_expsym_cmds \
-+module_cmds \
-+module_expsym_cmds \
-+export_symbols_cmds \
-+prelink_cmds \
-+postinstall_cmds \
-+postuninstall_cmds \
-+finish_cmds \
-+sys_lib_search_path_spec \
-+sys_lib_dlsearch_path_spec \
-+reload_cmds_CXX \
-+old_archive_cmds_CXX \
-+old_archive_from_new_cmds_CXX \
-+old_archive_from_expsyms_cmds_CXX \
-+archive_cmds_CXX \
-+archive_expsym_cmds_CXX \
-+module_cmds_CXX \
-+module_expsym_cmds_CXX \
-+export_symbols_cmds_CXX \
-+prelink_cmds_CXX; do
-+    case \`eval \\\\\$ECHO \\\\""\\\\\$\$var"\\\\"\` in
-+    *[\\\\\\\`\\"\\\$]*)
-+      eval "lt_\$var=\\\\\\"\\\`\\\$ECHO \\"\\\$\$var\\" | \\\$SED -e \\"\\\$double_quote_subst\\" -e \\"\\\$sed_quote_subst\\" -e \\"\\\$delay_variable_subst\\"\\\`\\\\\\""
-+      ;;
-+    *)
-+      eval "lt_\$var=\\\\\\"\\\$\$var\\\\\\""
-+      ;;
-+    esac
-+done
-+
-+ac_aux_dir='$ac_aux_dir'
-+xsi_shell='$xsi_shell'
-+lt_shell_append='$lt_shell_append'
-+
-+# See if we are running on zsh, and set the options which allow our
-+# commands through without removal of \ escapes INIT.
-+if test -n "\${ZSH_VERSION+set}" ; then
-+   setopt NO_GLOB_SUBST
-+fi
-+
-+
-+    PACKAGE='$PACKAGE'
-+    VERSION='$VERSION'
-+    TIMESTAMP='$TIMESTAMP'
-+    RM='$RM'
-+    ofile='$ofile'
-+
-+
-+
-+
-+
-+_LTEOF
-+
-+cat >>"$CONFIG_LT" <<\_LTEOF
-+{ $as_echo "$as_me:${as_lineno-$LINENO}: creating $ofile" >&5
-+$as_echo "$as_me: creating $ofile" >&6;}
-+
-+
-+    # See if we are running on zsh, and set the options which allow our
-+    # commands through without removal of \ escapes.
-+    if test -n "${ZSH_VERSION+set}" ; then
-+      setopt NO_GLOB_SUBST
-+    fi
-+
-+    cfgfile="${ofile}T"
-+    trap "$RM \"$cfgfile\"; exit 1" 1 2 15
-+    $RM "$cfgfile"
-+
-+    cat <<_LT_EOF >> "$cfgfile"
-+#! $SHELL
-+
-+# `$ECHO "$ofile" | sed 's%^.*/%%'` - Provide generalized library-building support services.
-+# Generated automatically by $as_me ($PACKAGE$TIMESTAMP) $VERSION
-+# Libtool was configured on host `(hostname || uname -n) 2>/dev/null | sed 1q`:
-+# NOTE: Changes made to this file will be lost: look at ltmain.sh.
-+#
-+#   Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2003, 2004, 2005,
-+#                 2006, 2007, 2008, 2009 Free Software Foundation, Inc.
-+#   Written by Gordon Matzigkeit, 1996
-+#
-+#   This file is part of GNU Libtool.
-+#
-+# GNU Libtool is free software; you can redistribute it and/or
-+# modify it under the terms of the GNU General Public License as
-+# published by the Free Software Foundation; either version 2 of
-+# the License, or (at your option) any later version.
-+#
-+# As a special exception to the GNU General Public License,
-+# if you distribute this file as part of a program or library that
-+# is built using GNU Libtool, you may include this file under the
-+# same distribution terms that you use for the rest of that program.
-+#
-+# GNU Libtool is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+# GNU General Public License for more details.
-+#
-+# You should have received a copy of the GNU General Public License
-+# along with GNU Libtool; see the file COPYING.  If not, a copy
-+# can be downloaded from http://www.gnu.org/licenses/gpl.html, or
-+# obtained by writing to the Free Software Foundation, Inc.,
-+# 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
-+
-+
-+# The names of the tagged configurations supported by this script.
-+available_tags="CXX "
-+
-+# ### BEGIN LIBTOOL CONFIG
-+
-+# Which release of libtool.m4 was used?
-+macro_version=$macro_version
-+macro_revision=$macro_revision
-+
-+# Whether or not to build shared libraries.
-+build_libtool_libs=$enable_shared
-+
-+# Whether or not to build static libraries.
-+build_old_libs=$enable_static
-+
-+# What type of objects to build.
-+pic_mode=$pic_mode
-+
-+# Whether or not to optimize for fast installation.
-+fast_install=$enable_fast_install
-+
-+# Shell to use when invoking shell scripts.
-+SHELL=$lt_SHELL
-+
-+# An echo program that protects backslashes.
-+ECHO=$lt_ECHO
-+
-+# The host system.
-+host_alias=$host_alias
-+host=$host
-+host_os=$host_os
-+
-+# The build system.
-+build_alias=$build_alias
-+build=$build
-+build_os=$build_os
-+
-+# A sed program that does not truncate output.
-+SED=$lt_SED
-+
-+# Sed that helps us avoid accidentally triggering echo(1) options like -n.
-+Xsed="\$SED -e 1s/^X//"
-+
-+# A grep program that handles long lines.
-+GREP=$lt_GREP
-+
-+# An ERE matcher.
-+EGREP=$lt_EGREP
-+
-+# A literal string matcher.
-+FGREP=$lt_FGREP
-+
-+# A BSD- or MS-compatible name lister.
-+NM=$lt_NM
-+
-+# Whether we need soft or hard links.
-+LN_S=$lt_LN_S
-+
-+# What is the maximum length of a command?
-+max_cmd_len=$max_cmd_len
-+
-+# Object file suffix (normally "o").
-+objext=$ac_objext
-+
-+# Executable file suffix (normally "").
-+exeext=$exeext
-+
-+# whether the shell understands "unset".
-+lt_unset=$lt_unset
-+
-+# turn spaces into newlines.
-+SP2NL=$lt_lt_SP2NL
-+
-+# turn newlines into spaces.
-+NL2SP=$lt_lt_NL2SP
-+
-+# An object symbol dumper.
-+OBJDUMP=$lt_OBJDUMP
-+
-+# Method to check whether dependent libraries are shared objects.
-+deplibs_check_method=$lt_deplibs_check_method
-+
-+# Command to use when deplibs_check_method == "file_magic".
-+file_magic_cmd=$lt_file_magic_cmd
-+
-+# The archiver.
-+AR=$lt_AR
-+AR_FLAGS=$lt_AR_FLAGS
-+
-+# A symbol stripping program.
-+STRIP=$lt_STRIP
-+
-+# Commands used to install an old-style archive.
-+RANLIB=$lt_RANLIB
-+old_postinstall_cmds=$lt_old_postinstall_cmds
-+old_postuninstall_cmds=$lt_old_postuninstall_cmds
-+
-+# Whether to use a lock for old archive extraction.
-+lock_old_archive_extraction=$lock_old_archive_extraction
-+
-+# A C compiler.
-+LTCC=$lt_CC
-+
-+# LTCC compiler flags.
-+LTCFLAGS=$lt_CFLAGS
-+
-+# Take the output of nm and produce a listing of raw symbols and C names.
-+global_symbol_pipe=$lt_lt_cv_sys_global_symbol_pipe
-+
-+# Transform the output of nm in a proper C declaration.
-+global_symbol_to_cdecl=$lt_lt_cv_sys_global_symbol_to_cdecl
-+
-+# Transform the output of nm in a C name address pair.
-+global_symbol_to_c_name_address=$lt_lt_cv_sys_global_symbol_to_c_name_address
-+
-+# Transform the output of nm in a C name address pair when lib prefix is needed.
-+global_symbol_to_c_name_address_lib_prefix=$lt_lt_cv_sys_global_symbol_to_c_name_address_lib_prefix
-+
-+# The name of the directory that contains temporary libtool files.
-+objdir=$objdir
-+
-+# Used to examine libraries when file_magic_cmd begins with "file".
-+MAGIC_CMD=$MAGIC_CMD
-+
-+# Must we lock files when doing compilation?
-+need_locks=$lt_need_locks
-+
-+# Tool to manipulate archived DWARF debug symbol files on Mac OS X.
-+DSYMUTIL=$lt_DSYMUTIL
-+
-+# Tool to change global to local symbols on Mac OS X.
-+NMEDIT=$lt_NMEDIT
-+
-+# Tool to manipulate fat objects and archives on Mac OS X.
-+LIPO=$lt_LIPO
-+
-+# ldd/readelf like tool for Mach-O binaries on Mac OS X.
-+OTOOL=$lt_OTOOL
-+
-+# ldd/readelf like tool for 64 bit Mach-O binaries on Mac OS X 10.4.
-+OTOOL64=$lt_OTOOL64
-+
-+# Old archive suffix (normally "a").
-+libext=$libext
-+
-+# Shared library suffix (normally ".so").
-+shrext_cmds=$lt_shrext_cmds
-+
-+# The commands to extract the exported symbol list from a shared archive.
-+extract_expsyms_cmds=$lt_extract_expsyms_cmds
-+
-+# Variables whose values should be saved in libtool wrapper scripts and
-+# restored at link time.
-+variables_saved_for_relink=$lt_variables_saved_for_relink
-+
-+# Do we need the "lib" prefix for modules?
-+need_lib_prefix=$need_lib_prefix
-+
-+# Do we need a version for libraries?
-+need_version=$need_version
-+
-+# Library versioning type.
-+version_type=$version_type
-+
-+# Shared library runtime path variable.
-+runpath_var=$runpath_var
-+
-+# Shared library path variable.
-+shlibpath_var=$shlibpath_var
-+
-+# Is shlibpath searched before the hard-coded library search path?
-+shlibpath_overrides_runpath=$shlibpath_overrides_runpath
-+
-+# Format of library name prefix.
-+libname_spec=$lt_libname_spec
-+
-+# List of archive names.  First name is the real one, the rest are links.
-+# The last name is the one that the linker finds with -lNAME
-+library_names_spec=$lt_library_names_spec
-+
-+# The coded name of the library, if different from the real name.
-+soname_spec=$lt_soname_spec
-+
-+# Permission mode override for installation of shared libraries.
-+install_override_mode=$lt_install_override_mode
-+
-+# Command to use after installation of a shared archive.
-+postinstall_cmds=$lt_postinstall_cmds
-+
-+# Command to use after uninstallation of a shared archive.
-+postuninstall_cmds=$lt_postuninstall_cmds
-+
-+# Commands used to finish a libtool library installation in a directory.
-+finish_cmds=$lt_finish_cmds
-+
-+# As "finish_cmds", except a single script fragment to be evaled but
-+# not shown.
-+finish_eval=$lt_finish_eval
-+
-+# Whether we should hardcode library paths into libraries.
-+hardcode_into_libs=$hardcode_into_libs
-+
-+# Compile-time system search path for libraries.
-+sys_lib_search_path_spec=$lt_sys_lib_search_path_spec
-+
-+# Run-time system search path for libraries.
-+sys_lib_dlsearch_path_spec=$lt_sys_lib_dlsearch_path_spec
-+
-+# Whether dlopen is supported.
-+dlopen_support=$enable_dlopen
-+
-+# Whether dlopen of programs is supported.
-+dlopen_self=$enable_dlopen_self
-+
-+# Whether dlopen of statically linked programs is supported.
-+dlopen_self_static=$enable_dlopen_self_static
-+
-+# Commands to strip libraries.
-+old_striplib=$lt_old_striplib
-+striplib=$lt_striplib
-+
-+
-+# The linker used to build libraries.
-+LD=$lt_LD
-+
-+# How to create reloadable object files.
-+reload_flag=$lt_reload_flag
-+reload_cmds=$lt_reload_cmds
-+
-+# Commands used to build an old-style archive.
-+old_archive_cmds=$lt_old_archive_cmds
-+
-+# A language specific compiler.
-+CC=$lt_compiler
-+
-+# Is the compiler the GNU compiler?
-+with_gcc=$GCC
-+
-+# Compiler flag to turn off builtin functions.
-+no_builtin_flag=$lt_lt_prog_compiler_no_builtin_flag
-+
-+# How to pass a linker flag through the compiler.
-+wl=$lt_lt_prog_compiler_wl
-+
-+# Additional compiler flags for building library objects.
-+pic_flag=$lt_lt_prog_compiler_pic
-+
-+# Compiler flag to prevent dynamic linking.
-+link_static_flag=$lt_lt_prog_compiler_static
-+
-+# Does compiler simultaneously support -c and -o options?
-+compiler_c_o=$lt_lt_cv_prog_compiler_c_o
-+
-+# Whether or not to add -lc for building shared libraries.
-+build_libtool_need_lc=$archive_cmds_need_lc
-+
-+# Whether or not to disallow shared libs when runtime libs are static.
-+allow_libtool_libs_with_static_runtimes=$enable_shared_with_static_runtimes
-+
-+# Compiler flag to allow reflexive dlopens.
-+export_dynamic_flag_spec=$lt_export_dynamic_flag_spec
-+
-+# Compiler flag to generate shared objects directly from archives.
-+whole_archive_flag_spec=$lt_whole_archive_flag_spec
-+
-+# Whether the compiler copes with passing no objects directly.
-+compiler_needs_object=$lt_compiler_needs_object
-+
-+# Create an old-style archive from a shared archive.
-+old_archive_from_new_cmds=$lt_old_archive_from_new_cmds
-+
-+# Create a temporary old-style archive to link instead of a shared archive.
-+old_archive_from_expsyms_cmds=$lt_old_archive_from_expsyms_cmds
-+
-+# Commands used to build a shared archive.
-+archive_cmds=$lt_archive_cmds
-+archive_expsym_cmds=$lt_archive_expsym_cmds
-+
-+# Commands used to build a loadable module if different from building
-+# a shared archive.
-+module_cmds=$lt_module_cmds
-+module_expsym_cmds=$lt_module_expsym_cmds
-+
-+# Whether we are building with GNU ld or not.
-+with_gnu_ld=$lt_with_gnu_ld
-+
-+# Flag that allows shared libraries with undefined symbols to be built.
-+allow_undefined_flag=$lt_allow_undefined_flag
-+
-+# Flag that enforces no undefined symbols.
-+no_undefined_flag=$lt_no_undefined_flag
-+
-+# Flag to hardcode \$libdir into a binary during linking.
-+# This must work even if \$libdir does not exist
-+hardcode_libdir_flag_spec=$lt_hardcode_libdir_flag_spec
-+
-+# If ld is used when linking, flag to hardcode \$libdir into a binary
-+# during linking.  This must work even if \$libdir does not exist.
-+hardcode_libdir_flag_spec_ld=$lt_hardcode_libdir_flag_spec_ld
-+
-+# Whether we need a single "-rpath" flag with a separated argument.
-+hardcode_libdir_separator=$lt_hardcode_libdir_separator
-+
-+# Set to "yes" if using DIR/libNAME\${shared_ext} during linking hardcodes
-+# DIR into the resulting binary.
-+hardcode_direct=$hardcode_direct
-+
-+# Set to "yes" if using DIR/libNAME\${shared_ext} during linking hardcodes
-+# DIR into the resulting binary and the resulting library dependency is
-+# "absolute",i.e impossible to change by setting \${shlibpath_var} if the
-+# library is relocated.
-+hardcode_direct_absolute=$hardcode_direct_absolute
-+
-+# Set to "yes" if using the -LDIR flag during linking hardcodes DIR
-+# into the resulting binary.
-+hardcode_minus_L=$hardcode_minus_L
-+
-+# Set to "yes" if using SHLIBPATH_VAR=DIR during linking hardcodes DIR
-+# into the resulting binary.
-+hardcode_shlibpath_var=$hardcode_shlibpath_var
-+
-+# Set to "yes" if building a shared library automatically hardcodes DIR
-+# into the library and all subsequent libraries and executables linked
-+# against it.
-+hardcode_automatic=$hardcode_automatic
-+
-+# Set to yes if linker adds runtime paths of dependent libraries
-+# to runtime path list.
-+inherit_rpath=$inherit_rpath
-+
-+# Whether libtool must link a program against all its dependency libraries.
-+link_all_deplibs=$link_all_deplibs
-+
-+# Fix the shell variable \$srcfile for the compiler.
-+fix_srcfile_path=$lt_fix_srcfile_path
-+
-+# Set to "yes" if exported symbols are required.
-+always_export_symbols=$always_export_symbols
-+
-+# The commands to list exported symbols.
-+export_symbols_cmds=$lt_export_symbols_cmds
-+
-+# Symbols that should not be listed in the preloaded symbols.
-+exclude_expsyms=$lt_exclude_expsyms
-+
-+# Symbols that must always be exported.
-+include_expsyms=$lt_include_expsyms
-+
-+# Commands necessary for linking programs (against libraries) with templates.
-+prelink_cmds=$lt_prelink_cmds
-+
-+# Specify filename containing input files.
-+file_list_spec=$lt_file_list_spec
-+
-+# How to hardcode a shared library path into an executable.
-+hardcode_action=$hardcode_action
-+
-+# The directories searched by this compiler when creating a shared library.
-+compiler_lib_search_dirs=$lt_compiler_lib_search_dirs
-+
-+# Dependencies to place before and after the objects being linked to
-+# create a shared library.
-+predep_objects=$lt_predep_objects
-+postdep_objects=$lt_postdep_objects
-+predeps=$lt_predeps
-+postdeps=$lt_postdeps
-+
-+# The library search path used internally by the compiler when linking
-+# a shared library.
-+compiler_lib_search_path=$lt_compiler_lib_search_path
-+
-+# ### END LIBTOOL CONFIG
-+
-+_LT_EOF
-+
-+  case $host_os in
-+  aix3*)
-+    cat <<\_LT_EOF >> "$cfgfile"
-+# AIX sometimes has problems with the GCC collect2 program.  For some
-+# reason, if we set the COLLECT_NAMES environment variable, the problems
-+# vanish in a puff of smoke.
-+if test "X${COLLECT_NAMES+set}" != Xset; then
-+  COLLECT_NAMES=
-+  export COLLECT_NAMES
-+fi
-+_LT_EOF
-+    ;;
-+  esac
-+
-+
-+ltmain="$ac_aux_dir/ltmain.sh"
-+
-+
-+  # We use sed instead of cat because bash on DJGPP gets confused if
-+  # if finds mixed CR/LF and LF-only lines.  Since sed operates in
-+  # text mode, it properly converts lines to CR/LF.  This bash problem
-+  # is reportedly fixed, but why not run on old versions too?
-+  sed '/^# Generated shell functions inserted here/q' "$ltmain" >> "$cfgfile" \
-+    || (rm -f "$cfgfile"; exit 1)
-+
-+  case $xsi_shell in
-+  yes)
-+    cat << \_LT_EOF >> "$cfgfile"
-+
-+# func_dirname file append nondir_replacement
-+# Compute the dirname of FILE.  If nonempty, add APPEND to the result,
-+# otherwise set result to NONDIR_REPLACEMENT.
-+func_dirname ()
-+{
-+  case ${1} in
-+    */*) func_dirname_result="${1%/*}${2}" ;;
-+    *  ) func_dirname_result="${3}" ;;
-+  esac
-+}
-+
-+# func_basename file
-+func_basename ()
-+{
-+  func_basename_result="${1##*/}"
-+}
-+
-+# func_dirname_and_basename file append nondir_replacement
-+# perform func_basename and func_dirname in a single function
-+# call:
-+#   dirname:  Compute the dirname of FILE.  If nonempty,
-+#             add APPEND to the result, otherwise set result
-+#             to NONDIR_REPLACEMENT.
-+#             value returned in "$func_dirname_result"
-+#   basename: Compute filename of FILE.
-+#             value retuned in "$func_basename_result"
-+# Implementation must be kept synchronized with func_dirname
-+# and func_basename. For efficiency, we do not delegate to
-+# those functions but instead duplicate the functionality here.
-+func_dirname_and_basename ()
-+{
-+  case ${1} in
-+    */*) func_dirname_result="${1%/*}${2}" ;;
-+    *  ) func_dirname_result="${3}" ;;
-+  esac
-+  func_basename_result="${1##*/}"
-+}
-+
-+# func_stripname prefix suffix name
-+# strip PREFIX and SUFFIX off of NAME.
-+# PREFIX and SUFFIX must not contain globbing or regex special
-+# characters, hashes, percent signs, but SUFFIX may contain a leading
-+# dot (in which case that matches only a dot).
-+func_stripname ()
-+{
-+  # pdksh 5.2.14 does not do ${X%$Y} correctly if both X and Y are
-+  # positional parameters, so assign one to ordinary parameter first.
-+  func_stripname_result=${3}
-+  func_stripname_result=${func_stripname_result#"${1}"}
-+  func_stripname_result=${func_stripname_result%"${2}"}
-+}
-+
-+# func_opt_split
-+func_opt_split ()
-+{
-+  func_opt_split_opt=${1%%=*}
-+  func_opt_split_arg=${1#*=}
-+}
-+
-+# func_lo2o object
-+func_lo2o ()
-+{
-+  case ${1} in
-+    *.lo) func_lo2o_result=${1%.lo}.${objext} ;;
-+    *)    func_lo2o_result=${1} ;;
-+  esac
-+}
-+
-+# func_xform libobj-or-source
-+func_xform ()
-+{
-+  func_xform_result=${1%.*}.lo
-+}
-+
-+# func_arith arithmetic-term...
-+func_arith ()
-+{
-+  func_arith_result=$(( $* ))
-+}
-+
-+# func_len string
-+# STRING may not start with a hyphen.
-+func_len ()
-+{
-+  func_len_result=${#1}
-+}
-+
-+_LT_EOF
-+    ;;
-+  *) # Bourne compatible functions.
-+    cat << \_LT_EOF >> "$cfgfile"
-+
-+# func_dirname file append nondir_replacement
-+# Compute the dirname of FILE.  If nonempty, add APPEND to the result,
-+# otherwise set result to NONDIR_REPLACEMENT.
-+func_dirname ()
-+{
-+  # Extract subdirectory from the argument.
-+  func_dirname_result=`$ECHO "${1}" | $SED "$dirname"`
-+  if test "X$func_dirname_result" = "X${1}"; then
-+    func_dirname_result="${3}"
-+  else
-+    func_dirname_result="$func_dirname_result${2}"
-+  fi
-+}
-+
-+# func_basename file
-+func_basename ()
-+{
-+  func_basename_result=`$ECHO "${1}" | $SED "$basename"`
-+}
-+
-+
-+# func_stripname prefix suffix name
-+# strip PREFIX and SUFFIX off of NAME.
-+# PREFIX and SUFFIX must not contain globbing or regex special
-+# characters, hashes, percent signs, but SUFFIX may contain a leading
-+# dot (in which case that matches only a dot).
-+# func_strip_suffix prefix name
-+func_stripname ()
-+{
-+  case ${2} in
-+    .*) func_stripname_result=`$ECHO "${3}" | $SED "s%^${1}%%; s%\\\\${2}\$%%"`;;
-+    *)  func_stripname_result=`$ECHO "${3}" | $SED "s%^${1}%%; s%${2}\$%%"`;;
-+  esac
-+}
-+
-+# sed scripts:
-+my_sed_long_opt='1s/^\(-[^=]*\)=.*/\1/;q'
-+my_sed_long_arg='1s/^-[^=]*=//'
-+
-+# func_opt_split
-+func_opt_split ()
-+{
-+  func_opt_split_opt=`$ECHO "${1}" | $SED "$my_sed_long_opt"`
-+  func_opt_split_arg=`$ECHO "${1}" | $SED "$my_sed_long_arg"`
-+}
-+
-+# func_lo2o object
-+func_lo2o ()
-+{
-+  func_lo2o_result=`$ECHO "${1}" | $SED "$lo2o"`
-+}
-+
-+# func_xform libobj-or-source
-+func_xform ()
-+{
-+  func_xform_result=`$ECHO "${1}" | $SED 's/\.[^.]*$/.lo/'`
-+}
-+
-+# func_arith arithmetic-term...
-+func_arith ()
-+{
-+  func_arith_result=`expr "$@"`
-+}
-+
-+# func_len string
-+# STRING may not start with a hyphen.
-+func_len ()
-+{
-+  func_len_result=`expr "$1" : ".*" 2>/dev/null || echo $max_cmd_len`
-+}
-+
-+_LT_EOF
-+esac
-+
-+case $lt_shell_append in
-+  yes)
-+    cat << \_LT_EOF >> "$cfgfile"
-+
-+# func_append var value
-+# Append VALUE to the end of shell variable VAR.
-+func_append ()
-+{
-+  eval "$1+=\$2"
-+}
-+_LT_EOF
-+    ;;
-+  *)
-+    cat << \_LT_EOF >> "$cfgfile"
-+
-+# func_append var value
-+# Append VALUE to the end of shell variable VAR.
-+func_append ()
-+{
-+  eval "$1=\$$1\$2"
-+}
-+
-+_LT_EOF
-+    ;;
-+  esac
-+
-+
-+  sed -n '/^# Generated shell functions inserted here/,$p' "$ltmain" >> "$cfgfile" \
-+    || (rm -f "$cfgfile"; exit 1)
-+
-+  mv -f "$cfgfile" "$ofile" ||
-+    (rm -f "$ofile" && cp "$cfgfile" "$ofile" && rm -f "$cfgfile")
-+  chmod +x "$ofile"
-+
-+
-+    cat <<_LT_EOF >> "$ofile"
-+
-+# ### BEGIN LIBTOOL TAG CONFIG: CXX
-+
-+# The linker used to build libraries.
-+LD=$lt_LD_CXX
-+
-+# How to create reloadable object files.
-+reload_flag=$lt_reload_flag_CXX
-+reload_cmds=$lt_reload_cmds_CXX
-+
-+# Commands used to build an old-style archive.
-+old_archive_cmds=$lt_old_archive_cmds_CXX
-+
-+# A language specific compiler.
-+CC=$lt_compiler_CXX
-+
-+# Is the compiler the GNU compiler?
-+with_gcc=$GCC_CXX
-+
-+# Compiler flag to turn off builtin functions.
-+no_builtin_flag=$lt_lt_prog_compiler_no_builtin_flag_CXX
-+
-+# How to pass a linker flag through the compiler.
-+wl=$lt_lt_prog_compiler_wl_CXX
-+
-+# Additional compiler flags for building library objects.
-+pic_flag=$lt_lt_prog_compiler_pic_CXX
-+
-+# Compiler flag to prevent dynamic linking.
-+link_static_flag=$lt_lt_prog_compiler_static_CXX
-+
-+# Does compiler simultaneously support -c and -o options?
-+compiler_c_o=$lt_lt_cv_prog_compiler_c_o_CXX
-+
-+# Whether or not to add -lc for building shared libraries.
-+build_libtool_need_lc=$archive_cmds_need_lc_CXX
-+
-+# Whether or not to disallow shared libs when runtime libs are static.
-+allow_libtool_libs_with_static_runtimes=$enable_shared_with_static_runtimes_CXX
-+
-+# Compiler flag to allow reflexive dlopens.
-+export_dynamic_flag_spec=$lt_export_dynamic_flag_spec_CXX
-+
-+# Compiler flag to generate shared objects directly from archives.
-+whole_archive_flag_spec=$lt_whole_archive_flag_spec_CXX
-+
-+# Whether the compiler copes with passing no objects directly.
-+compiler_needs_object=$lt_compiler_needs_object_CXX
-+
-+# Create an old-style archive from a shared archive.
-+old_archive_from_new_cmds=$lt_old_archive_from_new_cmds_CXX
-+
-+# Create a temporary old-style archive to link instead of a shared archive.
-+old_archive_from_expsyms_cmds=$lt_old_archive_from_expsyms_cmds_CXX
-+
-+# Commands used to build a shared archive.
-+archive_cmds=$lt_archive_cmds_CXX
-+archive_expsym_cmds=$lt_archive_expsym_cmds_CXX
-+
-+# Commands used to build a loadable module if different from building
-+# a shared archive.
-+module_cmds=$lt_module_cmds_CXX
-+module_expsym_cmds=$lt_module_expsym_cmds_CXX
-+
-+# Whether we are building with GNU ld or not.
-+with_gnu_ld=$lt_with_gnu_ld_CXX
-+
-+# Flag that allows shared libraries with undefined symbols to be built.
-+allow_undefined_flag=$lt_allow_undefined_flag_CXX
-+
-+# Flag that enforces no undefined symbols.
-+no_undefined_flag=$lt_no_undefined_flag_CXX
-+
-+# Flag to hardcode \$libdir into a binary during linking.
-+# This must work even if \$libdir does not exist
-+hardcode_libdir_flag_spec=$lt_hardcode_libdir_flag_spec_CXX
-+
-+# If ld is used when linking, flag to hardcode \$libdir into a binary
-+# during linking.  This must work even if \$libdir does not exist.
-+hardcode_libdir_flag_spec_ld=$lt_hardcode_libdir_flag_spec_ld_CXX
-+
-+# Whether we need a single "-rpath" flag with a separated argument.
-+hardcode_libdir_separator=$lt_hardcode_libdir_separator_CXX
-+
-+# Set to "yes" if using DIR/libNAME\${shared_ext} during linking hardcodes
-+# DIR into the resulting binary.
-+hardcode_direct=$hardcode_direct_CXX
-+
-+# Set to "yes" if using DIR/libNAME\${shared_ext} during linking hardcodes
-+# DIR into the resulting binary and the resulting library dependency is
-+# "absolute",i.e impossible to change by setting \${shlibpath_var} if the
-+# library is relocated.
-+hardcode_direct_absolute=$hardcode_direct_absolute_CXX
-+
-+# Set to "yes" if using the -LDIR flag during linking hardcodes DIR
-+# into the resulting binary.
-+hardcode_minus_L=$hardcode_minus_L_CXX
-+
-+# Set to "yes" if using SHLIBPATH_VAR=DIR during linking hardcodes DIR
-+# into the resulting binary.
-+hardcode_shlibpath_var=$hardcode_shlibpath_var_CXX
-+
-+# Set to "yes" if building a shared library automatically hardcodes DIR
-+# into the library and all subsequent libraries and executables linked
-+# against it.
-+hardcode_automatic=$hardcode_automatic_CXX
-+
-+# Set to yes if linker adds runtime paths of dependent libraries
-+# to runtime path list.
-+inherit_rpath=$inherit_rpath_CXX
-+
-+# Whether libtool must link a program against all its dependency libraries.
-+link_all_deplibs=$link_all_deplibs_CXX
-+
-+# Fix the shell variable \$srcfile for the compiler.
-+fix_srcfile_path=$lt_fix_srcfile_path_CXX
-+
-+# Set to "yes" if exported symbols are required.
-+always_export_symbols=$always_export_symbols_CXX
-+
-+# The commands to list exported symbols.
-+export_symbols_cmds=$lt_export_symbols_cmds_CXX
-+
-+# Symbols that should not be listed in the preloaded symbols.
-+exclude_expsyms=$lt_exclude_expsyms_CXX
-+
-+# Symbols that must always be exported.
-+include_expsyms=$lt_include_expsyms_CXX
-+
-+# Commands necessary for linking programs (against libraries) with templates.
-+prelink_cmds=$lt_prelink_cmds_CXX
-+
-+# Specify filename containing input files.
-+file_list_spec=$lt_file_list_spec_CXX
-+
-+# How to hardcode a shared library path into an executable.
-+hardcode_action=$hardcode_action_CXX
-+
-+# The directories searched by this compiler when creating a shared library.
-+compiler_lib_search_dirs=$lt_compiler_lib_search_dirs_CXX
-+
-+# Dependencies to place before and after the objects being linked to
-+# create a shared library.
-+predep_objects=$lt_predep_objects_CXX
-+postdep_objects=$lt_postdep_objects_CXX
-+predeps=$lt_predeps_CXX
-+postdeps=$lt_postdeps_CXX
-+
-+# The library search path used internally by the compiler when linking
-+# a shared library.
-+compiler_lib_search_path=$lt_compiler_lib_search_path_CXX
-+
-+# ### END LIBTOOL TAG CONFIG: CXX
-+_LT_EOF
-+
-+
-+as_fn_exit 0
-+_LTEOF
-+chmod +x "$CONFIG_LT"
-+
-+# configure is writing to config.log, but config.lt does its own redirection,
-+# appending to config.log, which fails on DOS, as config.log is still kept
-+# open by configure.  Here we exec the FD to /dev/null, effectively closing
-+# config.log, so it can be properly (re)opened and appended to by config.lt.
-+lt_cl_success=:
-+test "$silent" = yes &&
-+  lt_config_lt_args="$lt_config_lt_args --quiet"
-+exec 5>/dev/null
-+$SHELL "$CONFIG_LT" $lt_config_lt_args || lt_cl_success=false
-+exec 5>>config.log
-+$lt_cl_success || as_fn_exit 1
-+
-+
-+# Determine what GCC version number to use in filesystem paths.
-+
-+  get_gcc_base_ver="cat"
-+
-+# Check whether --with-gcc-major-version-only was given.
-+if test "${with_gcc_major_version_only+set}" = set; then :
-+  withval=$with_gcc_major_version_only; if test x$with_gcc_major_version_only = xyes ; then
-+        get_gcc_base_ver="sed -e 's/^\([0-9]*\).*/\1/'"
-+      fi
-+
-+fi
-+
-+
-+
-+
-+ac_config_files="$ac_config_files Makefile"
-+
-+ac_config_files="$ac_config_files scripts/testsuite_flags"
-+
-+ac_config_files="$ac_config_files scripts/extract_symvers"
-+
-+ac_config_files="$ac_config_files doc/xsl/customization.xsl"
- 
- 
- # Multilibs need MULTISUBDIR defined correctly in certain makefiles so
- # that multilib installs will end up installed in the correct place.
- # The testsuite needs it for multilib-aware ABI baseline files.
- # To work around this not being passed down from config-ml.in ->
-@@ -83166,12 +84969,13 @@ fi
+   fi
+@@ -83629,12 +83788,13 @@ fi
      TIMESTAMP='$TIMESTAMP'
      RM='$RM'
      ofile='$ofile'
@@ -5091,10 +3398,10 @@ index 61457e940ec09c6a2b945a8e290bb038277a6a94..f16bfea81cb0c480488d72c73b2edf5c
  CC="$CC"
  acx_cv_header_stdint="$acx_cv_header_stdint"
 diff --git a/libstdc++-v3/configure.ac b/libstdc++-v3/configure.ac
-index 5600cf38a31b09bdcce94f9e9f06974b2e991252..2ac33ef4e2f69bf7fb6ba06223aaf36e9dcdaae9 100644
+index dadd8827b493e1ea8b5c34ba727f8b1946878e00..d37941c07deaa2f57d727f8271aef2ff75cd0f87 100644
 --- a/libstdc++-v3/configure.ac
 +++ b/libstdc++-v3/configure.ac
-@@ -528,12 +528,15 @@ fi
+@@ -536,12 +536,15 @@ fi
  GLIBCXX_EXPORT_INSTALL_INFO
  
  # Export all the include and flag information to Makefiles.
@@ -5111,10 +3418,10 @@ index 5600cf38a31b09bdcce94f9e9f06974b2e991252..2ac33ef4e2f69bf7fb6ba06223aaf36e
  dnl which can all be called multiple times as needed, plus one (different)
  dnl AC_OUTPUT macro.  This one lists the files to be created:
 diff --git a/libstdc++-v3/crossconfig.m4 b/libstdc++-v3/crossconfig.m4
-index cb6e3afff3d7c8b2b419b008f717f601c6ebf8cf..6a6c0d6b16128ddb7cdb66799e0fbb64fe873d37 100644
+index 344eec09d8e7c86a85d6c0eb58789782ac4d455a..4783e8f05e6c298f7adf7d5a0568ad942960393b 100644
 --- a/libstdc++-v3/crossconfig.m4
 +++ b/libstdc++-v3/crossconfig.m4
-@@ -288,11 +288,19 @@ case "${host}" in
+@@ -297,11 +297,19 @@ case "${host}" in
      AC_DEFINE(HAVE_SINF)
      AC_DEFINE(HAVE_SINHF)
      AC_DEFINE(HAVE_SQRTF)
@@ -5135,13 +3442,13 @@ index cb6e3afff3d7c8b2b419b008f717f601c6ebf8cf..6a6c0d6b16128ddb7cdb66799e0fbb64
  esac
  ])
 diff --git a/libstdc++-v3/include/c_global/cstddef b/libstdc++-v3/include/c_global/cstddef
-index 36d7d716cc38a0bff6ee0e02758a14f8fe63d577..077a6b344af1fafaccb763330db23f325bcebe17 100644
+index 8c779ec354d84a18d91f1bb4bbb35892d1db2592..d4881da7ea8811e34e9f680287c3be6ef90eed2c 100644
 --- a/libstdc++-v3/include/c_global/cstddef
 +++ b/libstdc++-v3/include/c_global/cstddef
-@@ -49,14 +49,17 @@
- #include <bits/c++config.h>
- #include <stddef.h>
+@@ -51,14 +51,17 @@
  
+ extern "C++"
+ {
  #if __cplusplus >= 201103L
  namespace std
  {
@@ -5151,13 +3458,13 @@ index 36d7d716cc38a0bff6ee0e02758a14f8fe63d577..077a6b344af1fafaccb763330db23f32
    using ::max_align_t;
 +#endif
  }
- #endif
+ #endif // C++11
  
  #if __cplusplus >= 201703L
  namespace std
  {
 diff --git a/libstdc++-v3/include/c_std/cstddef b/libstdc++-v3/include/c_std/cstddef
-index 9ae10100f8d60e900cde415bb7e96baebf35c85d..eb0f1fab6f81ac3f0e56c22ce85532c889770292 100644
+index 8d3ba8b28d491903391540d9d70b561a4dd240d3..4f665fbbf77b2285bb8edd61c38441bc27cc9c62 100644
 --- a/libstdc++-v3/include/c_std/cstddef
 +++ b/libstdc++-v3/include/c_std/cstddef
 @@ -44,12 +44,15 @@
@@ -5177,5 +3484,5 @@ index 9ae10100f8d60e900cde415bb7e96baebf35c85d..eb0f1fab6f81ac3f0e56c22ce85532c8
  
  #endif // _GLIBCXX_CSTDDEF
 -- 
-2.30.0
+2.11.0
 

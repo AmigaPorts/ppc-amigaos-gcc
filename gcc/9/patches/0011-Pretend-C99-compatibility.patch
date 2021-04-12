@@ -1,22 +1,20 @@
-From bda9b577df2aea2c36f879cdb057134eefe5f09f Mon Sep 17 00:00:00 2001
+From 4bcecd9e4df4f9cc0cc185e9170233dd7fa47e5f Mon Sep 17 00:00:00 2001
 From: Sebastian Bauer <mail@sebastianbauer.info>
 Date: Sat, 4 Mar 2017 07:39:21 +0100
-Subject: [PATCH 11/27] Pretend C99 compatibility.
+Subject: [PATCH 11/32] Pretend C99 compatibility.
 
-At least newlib is not fully C99 compatible because it doesn't expose
-various C99 function if __STRICT_ANSI__ is declared. Also it misses
-strtold() (as clib2).
+Disable missing strtold() and pretend that newlib is C99 compatible.
 ---
- libstdc++-v3/config/os/amigaos/os_defines.h | 3 +++
+ libstdc++-v3/config/os/amigaos/os_defines.h | 1 +
  libstdc++-v3/include/bits/basic_string.h    | 3 +++
  libstdc++-v3/include/c_global/cstdlib       | 8 ++++++++
- 3 files changed, 14 insertions(+)
+ 3 files changed, 12 insertions(+)
 
 diff --git a/libstdc++-v3/config/os/amigaos/os_defines.h b/libstdc++-v3/config/os/amigaos/os_defines.h
-index 346f063958cd7e80ebf97be4acee0bdf391cb811..6b67630b7be7102a9dfb7c104deac6293a13c017 100644
+index 346f063958cd7e80ebf97be4acee0bdf391cb811..647c560e6ff196234fda2e14073ee0b7074ad5da 100644
 --- a/libstdc++-v3/config/os/amigaos/os_defines.h
 +++ b/libstdc++-v3/config/os/amigaos/os_defines.h
-@@ -35,9 +35,12 @@
+@@ -35,9 +35,10 @@
  
  // No ioctl() on AmigaOS
  #define _GLIBCXX_NO_IOCTL 1
@@ -24,16 +22,14 @@ index 346f063958cd7e80ebf97be4acee0bdf391cb811..6b67630b7be7102a9dfb7c104deac629
  #ifdef __NEWLIB__
  #define _GLIBCXX_USE_C99_STDINT_TR1 1
 +#define _GLIBCXX_USE_C99 1
-+/* Temporary until newlib behaves properly */
-+#undef __STRICT_ANSI__
  #endif
  
  #endif
 diff --git a/libstdc++-v3/include/bits/basic_string.h b/libstdc++-v3/include/bits/basic_string.h
-index 0f5d398fcf24c32bfc593e18b771a4f42eb85ae8..d01c86a175301024f8d1cb7e4384324b96e28b2e 100644
+index 40ef8758a5103d552a6dfbd045fe6b39236c216a..343249f79ae22f9919f20d7f1077e6215f9387fd 100644
 --- a/libstdc++-v3/include/bits/basic_string.h
 +++ b/libstdc++-v3/include/bits/basic_string.h
-@@ -6437,15 +6437,18 @@ _GLIBCXX_BEGIN_NAMESPACE_CXX11
+@@ -6530,15 +6530,18 @@ _GLIBCXX_BEGIN_NAMESPACE_CXX11
    { return __gnu_cxx::__stoa(&std::strtof, "stof", __str.c_str(), __idx); }
  
    inline double
@@ -53,7 +49,7 @@ index 0f5d398fcf24c32bfc593e18b771a4f42eb85ae8..d01c86a175301024f8d1cb7e4384324b
  
    // DR 1261.
 diff --git a/libstdc++-v3/include/c_global/cstdlib b/libstdc++-v3/include/c_global/cstdlib
-index 10335017f0c4261c02b0b4d87c15b9a8572e6a61..fb5ae1889b288097f793396f35a9b65c2acf9fbb 100644
+index 7e0ffc163888f3a960ab71bc9e47993938815579..77c67816aa3e27964e1604940e45bae577d98fb6 100644
 --- a/libstdc++-v3/include/c_global/cstdlib
 +++ b/libstdc++-v3/include/c_global/cstdlib
 @@ -187,13 +187,17 @@ _GLIBCXX_END_NAMESPACE_VERSION
@@ -107,5 +103,5 @@ index 10335017f0c4261c02b0b4d87c15b9a8572e6a61..fb5ae1889b288097f793396f35a9b65c
  } // extern "C++"
  
 -- 
-2.30.0
+2.11.0
 

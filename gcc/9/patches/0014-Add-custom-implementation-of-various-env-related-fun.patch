@@ -1,7 +1,7 @@
-From c6d68469620b2c54eca081bbe0d197f7dcba5bae Mon Sep 17 00:00:00 2001
+From de2b45b20db167b2bd7810ea923cbea3a223ecc0 Mon Sep 17 00:00:00 2001
 From: Sebastian Bauer <mail@sebastianbauer.info>
 Date: Wed, 4 Apr 2018 23:50:48 +0200
-Subject: [PATCH 14/27] Add custom implementation of various env-related
+Subject: [PATCH 14/32] Add custom implementation of various env-related
  functions.
 
 No official clib does support unsetenv() but this is required by newer gcc.
@@ -9,15 +9,15 @@ While there are custom implementation of setenv() and unsetenv(), it is
 unclear how their implementation interacts with the other ones that are
 part of the clib like putenv().
 ---
- libiberty/Makefile.in      | 13 +++++--
- libiberty/configure        | 11 ++++++
+ libiberty/Makefile.in      | 13 ++++++--
+ libiberty/configure        | 11 +++++++
  libiberty/configure.ac     |  6 ++++
- libiberty/setenv-amigaos.c | 74 ++++++++++++++++++++++++++++++++++++++
+ libiberty/setenv-amigaos.c | 74 ++++++++++++++++++++++++++++++++++++++++++++++
  4 files changed, 102 insertions(+), 2 deletions(-)
  create mode 100644 libiberty/setenv-amigaos.c
 
 diff --git a/libiberty/Makefile.in b/libiberty/Makefile.in
-index fa4f5f17cb5d9d6d78b3c071c738dec302193927..1ae667200cae3c076cc302b2685e3a07271a5300 100644
+index 3f453c4c5542b4f86bb987a69ee03eabc5f62077..0651b048e713230c4e19e05e2eb22c7324a6de50 100644
 --- a/libiberty/Makefile.in
 +++ b/libiberty/Makefile.in
 @@ -143,13 +143,13 @@ CFILES = alloca.c argv.c asprintf.c atexit.c				\
@@ -73,10 +73,10 @@ index fa4f5f17cb5d9d6d78b3c071c738dec302193927..1ae667200cae3c076cc302b2685e3a07
  	else true; fi
  	if [ x"$(NOASANFLAG)" != x ]; then \
 diff --git a/libiberty/configure b/libiberty/configure
-index bd81dc14b615c8f305a62f6a4b12926a0eb6752b..8d7e7670ffd68fddb11c8e57aae2edf2a1c30f00 100755
+index c8627e61151de605456472e182e9d63c5a9c4403..d06ee00ec91c8d91c0604d8abc9138cbf10008c0 100755
 --- a/libiberty/configure
 +++ b/libiberty/configure
-@@ -6296,12 +6296,23 @@ if test -z "${setobjs}"; then
+@@ -6366,12 +6366,23 @@ if test -z "${setobjs}"; then
    *-*-android*)
      # On android, getpagesize is defined in unistd.h as a static inline
      # function, which AC_CHECK_FUNCS does not handle properly.
@@ -101,10 +101,10 @@ index bd81dc14b615c8f305a62f6a4b12926a0eb6752b..8d7e7670ffd68fddb11c8e57aae2edf2
      libiberty_cv_var_sys_errlist=yes
      ;;
 diff --git a/libiberty/configure.ac b/libiberty/configure.ac
-index e0edfb00ac01b1090151a6039b4888b2809ff452..bf659d099e9cdfa030ec2d90e7992d6840dc2809 100644
+index a84932cc87e1effd98f22fce9bfb528d6036ea12..714288d2ba8f1c8d8cbd63fc456b9fd76931a2e9 100644
 --- a/libiberty/configure.ac
 +++ b/libiberty/configure.ac
-@@ -605,12 +605,18 @@ if test -z "${setobjs}"; then
+@@ -604,12 +604,18 @@ if test -z "${setobjs}"; then
    *-*-android*)
      # On android, getpagesize is defined in unistd.h as a static inline
      # function, which AC_CHECK_FUNCS does not handle properly.
@@ -204,5 +204,5 @@ index 0000000000000000000000000000000000000000..dc9a460737538d74558bb43c21c21e61
 +	return lvar->lv_Value;
 +}
 -- 
-2.30.0
+2.11.0
 

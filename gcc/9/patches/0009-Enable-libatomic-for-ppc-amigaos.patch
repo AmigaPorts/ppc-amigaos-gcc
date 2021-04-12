@@ -1,13 +1,13 @@
-From 6d43f9fdb55d9c14dabb384deca605242628ed09 Mon Sep 17 00:00:00 2001
+From 330c0d98c44e822fbe5795bd7b203143358eefe1 Mon Sep 17 00:00:00 2001
 From: Sebastian Bauer <mail@sebastianbauer.info>
 Date: Fri, 3 Mar 2017 08:52:48 +0100
-Subject: [PATCH 09/27] Enable libatomic for ppc-amigaos.
+Subject: [PATCH 09/32] Enable libatomic for ppc-amigaos.
 
 It is not really finished yet.
 ---
- libatomic/config/amigaos/host-config.h |  55 +++++++++++++
- libatomic/config/amigaos/lock.c        | 102 +++++++++++++++++++++++++
- libatomic/configure.tgt                |   4 +
+ libatomic/config/amigaos/host-config.h |  55 ++++++++++++++++++
+ libatomic/config/amigaos/lock.c        | 102 +++++++++++++++++++++++++++++++++
+ libatomic/configure.tgt                |   4 ++
  3 files changed, 161 insertions(+)
  create mode 100644 libatomic/config/amigaos/host-config.h
  create mode 100644 libatomic/config/amigaos/lock.c
@@ -182,7 +182,7 @@ index 0000000000000000000000000000000000000000..ffd09f50095429f844bfe6bf7bec8741
 +
 +#endif
 diff --git a/libatomic/configure.tgt b/libatomic/configure.tgt
-index ea8c34f8c710cc40b5646b665c24cc0933a92c73..03e6e94311c5150894a802637eaa4781c9287d51 100644
+index ecbb7d33cc11b451f83479009e9d2b43510f3f76..3814b63c252433b329f99b9abf69c63bb8e787ad 100644
 --- a/libatomic/configure.tgt
 +++ b/libatomic/configure.tgt
 @@ -156,12 +156,16 @@ case "${target}" in
@@ -203,5 +203,5 @@ index ea8c34f8c710cc40b5646b665c24cc0933a92c73..03e6e94311c5150894a802637eaa4781
  	# If the target supports disabling interrupts, we can work in
  	# kernel-mode, given the system is not multi-processor.
 -- 
-2.30.0
+2.11.0
 

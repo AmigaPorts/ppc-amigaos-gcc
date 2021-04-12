@@ -1,23 +1,23 @@
-From de30b79e0989a709b5b28828d7a7e029bff27fda Mon Sep 17 00:00:00 2001
+From f2926304ed58ecea614a304e0c648d162b86b4b4 Mon Sep 17 00:00:00 2001
 From: Sebastian Bauer <mail@sebastianbauer.info>
 Date: Sat, 28 Apr 2018 08:09:58 +0200
-Subject: [PATCH 22/27] Fix order of AmigaOS PPC sections in the documentation.
+Subject: [PATCH 22/32] Fix order of AmigaOS PPC sections in the documentation.
 
 ---
- gcc/doc/invoke.texi | 264 ++++++++++++++++++++++----------------------
+ gcc/doc/invoke.texi | 264 ++++++++++++++++++++++++++--------------------------
  1 file changed, 132 insertions(+), 132 deletions(-)
 
 diff --git a/gcc/doc/invoke.texi b/gcc/doc/invoke.texi
-index ee8085fff435aa062c69f666f245ceb4fa68fe22..b21dec174a50bbf7c38b206c93fc34d54cef2326 100644
+index 8b8f6c9e4d8302b649a679d8a3245cc150a42abb..e5179e131a28bdf37dc02ae99480b750e175e162 100644
 --- a/gcc/doc/invoke.texi
 +++ b/gcc/doc/invoke.texi
-@@ -14542,12 +14542,13 @@ platform.
- @c It should be the same order and spelling as these options are listed
+@@ -15554,12 +15554,13 @@ platform.
  @c in Machine Dependent Options
  
  @menu
  * AArch64 Options::
  * Adapteva Epiphany Options::
+ * AMD GCN Options::
 +* AmigaOS PPC options::
  * ARC Options::
  * ARM Options::
@@ -25,7 +25,7 @@ index ee8085fff435aa062c69f666f245ceb4fa68fe22..b21dec174a50bbf7c38b206c93fc34d5
  * Blackfin Options::
  * C6X Options::
  * CRIS Options::
-@@ -14599,13 +14600,12 @@ platform.
+@@ -15612,13 +15613,12 @@ platform.
  * VMS Options::
  * VxWorks Options::
  * x86 Options::
@@ -39,13 +39,28 @@ index ee8085fff435aa062c69f666f245ceb4fa68fe22..b21dec174a50bbf7c38b206c93fc34d5
  @node AArch64 Options
  @subsection AArch64 Options
  @cindex AArch64 Options
-@@ -15087,12 +15087,143 @@ Allowable values for @var{reg} are @samp{r43} and @samp{r63},
+@@ -16196,12 +16196,13 @@ Allowable values for @var{reg} are @samp{r43} and @samp{r63},
  which specify use of that register as a fixed register,
  and @samp{none}, which means that no register is used for this
  purpose.  The default is @option{-m1reg-none}.
  
  @end table
  
++<<<<<<< HEAD
+ @node AMD GCN Options
+ @subsection AMD GCN Options
+ @cindex AMD GCN Options
+ 
+ These options are defined specifically for the AMD GCN port.
+ 
+@@ -16228,12 +16229,142 @@ Compile for GCN5 Vega 10 devices (gfx900).
+ @opindex mstack-size
+ Specify how many @var{bytes} of stack space will be requested for each GPU
+ thread (wave-front).  Beware that there may be many threads and limited memory
+ available.  The size of the stack allocation may also have an impact on
+ run-time performance.  The default is 32KB when using OpenACC or OpenMP, and
+ 1MB otherwise.
++=======
 +@node AmigaOS PPC options
 +@subsection AmigaOS PPC options
 +@cindex AmigaOS PPC options
@@ -174,16 +189,14 @@ index ee8085fff435aa062c69f666f245ceb4fa68fe22..b21dec174a50bbf7c38b206c93fc34d5
 +Causes each function call through a function pointer to be performed as
 +if the function pointer was declared with the @samp{check68kfuncptr}
 +function attribute. @xref{Function Attributes}.
-+
-+@end table
-+
++>>>>>>> Fix order of AmigaOS PPC sections in the documentation.
+ 
+ @end table
+ 
  @node ARC Options
  @subsection ARC Options
  @cindex ARC options
- 
- The following options control the architecture variant for which code
- is being compiled:
-@@ -28216,143 +28347,12 @@ These options are defined for Xstormy16:
+@@ -28921,143 +29052,12 @@ These options are defined for Xstormy16:
  @table @gcctabopt
  @item -msim
  @opindex msim
@@ -328,5 +341,5 @@ index ee8085fff435aa062c69f666f245ceb4fa68fe22..b21dec174a50bbf7c38b206c93fc34d5
  These options are supported for Xtensa targets:
  
 -- 
-2.30.0
+2.11.0
 

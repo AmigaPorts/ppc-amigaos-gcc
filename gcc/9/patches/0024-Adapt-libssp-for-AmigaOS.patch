@@ -1,14 +1,14 @@
-From 80fdfb607de08280c6d34cdaf7318a0a1fcf530f Mon Sep 17 00:00:00 2001
+From 5c0f8009749dd7bcfa2a9fb668266a241306874f Mon Sep 17 00:00:00 2001
 From: Sebastian Bauer <mail@sebastianbauer.info>
 Date: Tue, 22 May 2018 23:14:01 +0200
-Subject: [PATCH 24/27] Adapt libssp for AmigaOS.
+Subject: [PATCH 24/32] Adapt libssp for AmigaOS.
 
 ---
  libssp/ssp.c | 8 +++++---
  1 file changed, 5 insertions(+), 3 deletions(-)
 
 diff --git a/libssp/ssp.c b/libssp/ssp.c
-index 741377ddd4050a1583952c32bdcffe372a3b4aa8..aa14566dea777c6629f4efd18e0c75d7c1fdae1d 100644
+index 82709112b1a4b681157bf5e62454cd54bcedd30c..870382c22c44a45187351ba47d14b6c2c24e8211 100644
 --- a/libssp/ssp.c
 +++ b/libssp/ssp.c
 @@ -55,12 +55,14 @@ see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see
@@ -64,5 +64,5 @@ index 741377ddd4050a1583952c32bdcffe372a3b4aa8..aa14566dea777c6629f4efd18e0c75d7
       is dead.  */
    {
 -- 
-2.30.0
+2.11.0
 
