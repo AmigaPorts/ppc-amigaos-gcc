@@ -1,7 +1,7 @@
 MAJOR_VERSION:=$(word 1, $(subst ., , $(VERSION)))
 
 FEATURES=\
-	--enable-languages=c,c++  \
+	--enable-languages=c,c++,objc,obj-c++  \
 	--enable-haifa            \
 	--enable-sjlj-exceptions  \
 	--disable-libstdcxx-pch \
