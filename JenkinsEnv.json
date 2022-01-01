@@ -5,7 +5,8 @@
             "DockerImage": "adtools",
             "DockerTag": "latest",
             "Dockerfile": "Dockerfile",
-            "BuildIfSuccessful": "docker-amiga-gcc"
+            "BuildIfSuccessful": "docker-amiga-gcc",
+            "BuildParam": "ppc-amigaos"
         }
     ]
 }
