@@ -9,7 +9,7 @@ FEATURES=\
 
 # Check, if major version is greater than or equals to 8
 ifeq ($(shell test $(MAJOR_VERSION) -ge 8; echo $$?), 0)
-FEATURES+=--enable-threads=amigaos --enable-lto
+FEATURES+=--enable-lto --enable-threads=amigaos
 
 # Check, if major version is greater than or equals to 11
 ifeq ($(shell test $(MAJOR_VERSION) -ge 11; echo $$?), 0)
