@@ -2,7 +2,7 @@
     "builds": [
         {
             "DockerRoot": "amigadev",
-            "DockerImage": "adtools",
+            "DockerImage": "ppc-amigaos",
             "DockerTag": "latest",
             "Dockerfile": "Dockerfile",
             "BuildIfSuccessful": "docker-amiga-gcc",
