@@ -6,7 +6,7 @@ COPY ./ /work/
 
 RUN gild/bin/gild-clone && \
     gild/bin/gild-checkout binutils 2.23.2 && \
-    gild/bin/gild-checkout gcc 10 && \
+    gild/bin/gild-checkout gcc 11 && \
     make -C native-build gcc-cross CROSS_PREFIX=/opt/ppc-amigaos -j$(nproc)
 
 RUN rm -rf /work/*
