@@ -36,8 +36,8 @@ endif
 
 GCC_BRANCH_NAME:=$(word 1, $(subst ., , $(GCC_VERSION)))
 
-SDK_URL=http://www.hyperion-entertainment.biz/index.php?option=com_registration&amp;view=download&amp;format=raw&amp;file=82&amp;Itemid=82
-SDK_VERSION=53.30
+SDK_URL=http://www.hyperion-entertainment.biz/index.php?option=com_registration&amp;view=download&amp;format=raw&amp;file=125&amp;Itemid=82
+SDK_VERSION=53.34
 
 # Native tools
 COREUTILS_SRC_DIR=../coreutils/repo
