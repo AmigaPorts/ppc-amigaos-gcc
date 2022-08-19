@@ -21,7 +21,8 @@ cross:
 									--enable-plugins \
 									--target=ppc-amigaos \
 									--prefix=$(PREFIX) \
-									--disable-werror
+									--disable-werror \
+									--disable-doc
 	make -C $(CROSS_BUILD_DIR)
 
 native:
