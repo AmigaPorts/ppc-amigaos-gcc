@@ -1,7 +1,7 @@
-From 46bf473f82fa04bdb21d752fc45daca5690bc1ea Mon Sep 17 00:00:00 2001
+From 208d59d9896977461f13965b4b81c33ee6a7a1d9 Mon Sep 17 00:00:00 2001
 From: Sebastian Bauer <mail@sebastianbauer.info>
 Date: Sat, 29 Nov 2014 11:32:22 +0100
-Subject: [PATCH 02/13] Fixed errors occuring with more recent versions of
+Subject: [PATCH 02/16] Fixed errors occuring with more recent versions of
  texinfo.
 
 ---
@@ -432,5 +432,5 @@ index 71e909e4b61606d4ca8d1f855d9cd10a3ae1947b..81d538bad91eee08ae24dc88f589b6d0
  
  @bye
 -- 
-2.30.2
+2.45.2
 

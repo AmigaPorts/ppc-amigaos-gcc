@@ -1,0 +1,31 @@
+From 9ad78503aca3da28488b56df16b440b3504ffee2 Mon Sep 17 00:00:00 2001
+From: Marlon Beijer <marlon@eevul.org>
+Date: Tue, 24 Sep 2024 16:32:46 +0200
+Subject: [PATCH 15/16] Fix texi2pod.pl
+
+---
+ etc/texi2pod.pl | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/etc/texi2pod.pl b/etc/texi2pod.pl
+index cd0ffd9435f735fab6d173716e852ebb74b4aafb..1c753c5a8fbe3836ea6c0bc464819a973ed880ff 100644
+--- a/etc/texi2pod.pl
++++ b/etc/texi2pod.pl
+@@ -308,13 +308,13 @@ while(<$inf>) {
+     };
+ 
+     /^\@item\s+(.*\S)\s*$/ and $endw eq "multitable" and do {
+ 	@columns = ();
+ 	for $column (split (/\s*\@tab\s*/, $1)) {
+ 	    # @strong{...} is used a @headitem work-alike
+-	    $column =~ s/^\@strong{(.*)}$/$1/;
++	    $column =~ s/^\@strong\{(.*)}$/$1/;
+ 	    push @columns, $column;
+ 	}
+ 	$_ = "\n=item ".join (" : ", @columns)."\n";
+     };
+ 
+     /^\@itemx?\s*(.+)?$/ and do {
+-- 
+2.45.2
+
