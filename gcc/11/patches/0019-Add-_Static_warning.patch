@@ -1,7 +1,7 @@
 From 351d481fe0a44ef60b11f8f7580633491508def4 Mon Sep 17 00:00:00 2001
 From: Sebastian Bauer <mail@sebastianbauer.info>
 Date: Tue, 24 Apr 2018 22:46:21 +0200
-Subject: [PATCH 19/40] Add _Static_warning().
+Subject: [PATCH 19/41] Add _Static_warning().
 
 This acts very similar to _Static_assert() but produces a warning
 rather than an compiler error.

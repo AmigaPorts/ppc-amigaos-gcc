@@ -1,7 +1,7 @@
 From 59b15ef7ff93aed87943fcf82cf21a098e3d6670 Mon Sep 17 00:00:00 2001
 From: "ola.soder@axis.com" <ola.soder@axis.com>
 Date: Sun, 7 Feb 2021 19:38:47 +0100
-Subject: [PATCH 32/40] gcc10: Don't define __STRICT_ANSI__.
+Subject: [PATCH 32/41] gcc10: Don't define __STRICT_ANSI__.
 
 Doing so hides C99 features when configuring libstdc++.
 ---

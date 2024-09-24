@@ -1,7 +1,7 @@
 From fe20de48138f24fbf7cf5dda25b4ee98852d3737 Mon Sep 17 00:00:00 2001
 From: Marlon Beijer <marlon@eevul.org>
 Date: Tue, 24 Sep 2024 16:17:00 +0200
-Subject: [PATCH 40/40] Fix libiberty
+Subject: [PATCH 40/41] Fix libiberty
 
 ---
  libiberty/simple-object-mach-o.c | 2 +-

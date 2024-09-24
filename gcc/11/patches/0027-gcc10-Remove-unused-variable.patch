@@ -1,7 +1,7 @@
 From 7382f16fd5c64d946c18bbaf3a55347cbb372087 Mon Sep 17 00:00:00 2001
 From: "ola.soder@axis.com" <ola.soder@axis.com>
 Date: Sat, 2 Jan 2021 17:25:51 +0100
-Subject: [PATCH 27/40] gcc10: Remove unused variable.
+Subject: [PATCH 27/41] gcc10: Remove unused variable.
 
 ---
  gcc/c/c-parser.c | 3 ---

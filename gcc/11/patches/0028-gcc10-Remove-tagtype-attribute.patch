@@ -1,7 +1,7 @@
 From 70c7055d6f36c48bcb51a3482d202d5a63fbef8b Mon Sep 17 00:00:00 2001
 From: "ola.soder@axis.com" <ola.soder@axis.com>
 Date: Sat, 2 Jan 2021 22:05:59 +0100
-Subject: [PATCH 28/40] gcc10: Remove tagtype attribute.
+Subject: [PATCH 28/41] gcc10: Remove tagtype attribute.
 
 The 'Add tagtype attribute that can be passed to enum' patch needs
 to be adapted. Temporarily disable the patch since adaptation requires
