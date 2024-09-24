@@ -1,0 +1,31 @@
+From fe20de48138f24fbf7cf5dda25b4ee98852d3737 Mon Sep 17 00:00:00 2001
+From: Marlon Beijer <marlon@eevul.org>
+Date: Tue, 24 Sep 2024 16:17:00 +0200
+Subject: [PATCH 40/40] Fix libiberty
+
+---
+ libiberty/simple-object-mach-o.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/libiberty/simple-object-mach-o.c b/libiberty/simple-object-mach-o.c
+index 72b69d19c21627aa29347bc3798aa8f407965fc7..a8869e7c63957d86d91d9987bbed40c8284fd253 100644
+--- a/libiberty/simple-object-mach-o.c
++++ b/libiberty/simple-object-mach-o.c
+@@ -1225,13 +1225,13 @@ simple_object_mach_o_write_segment (simple_object_write *sobj, int descriptor,
+ 	index[4 * i] -= index[0];
+       index[0] = 0;
+ 
+       /* Swap the indices, if required.  */
+ 
+       for (i = 0; i < (nsects_in * 4); ++i)
+-	set_32 (&index[i], index[i]);
++	set_32 ((unsigned char *) &index[i], index[i]);
+ 
+       sechdr_offset += sechdrsize;
+ 
+       /* Write out the section names.
+ 	 ... the header ...
+ 	 name_offset contains the length of the section.  It is not aligned.  */
+-- 
+2.45.2
+
