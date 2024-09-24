@@ -4,8 +4,11 @@ WORKDIR /work
 
 COPY ./ /work/
 
-RUN gild/bin/gild-clone && \
-    gild/bin/gild-checkout binutils 2.23.2 && \
+ENV PATH /opt/ppc-amigaos/bin:$PATH
+
+#gild/bin/gild-clone && \
+
+RUN gild/bin/gild-checkout binutils 2.23.2 && \
     gild/bin/gild-checkout gcc 11 && \
     make -C native-build gcc-cross CROSS_PREFIX=/opt/ppc-amigaos -j$(nproc)
 
@@ -14,6 +17,8 @@ RUN rm -rf /work/*
 FROM amigadev/docker-base:latest
 
 COPY --from=build-env /opt/ppc-amigaos /opt/ppc-amigaos
+
+ENV PATH /opt/ppc-amigaos/bin:$PATH
 
 RUN apt purge -y python-pip \
         genisoimage \
