@@ -29,6 +29,10 @@ CLIB4_SHA1?=HEAD
 SDK_VERSION?=54.16
 # Optional (DEFAULT=54.16):
 # Define SDK_VERSION to specify which version of the Amiga SDK is desired
+SDK_LOC?=
+# Optional (DEFAULT=):
+# Define the path that contains the local version of the SDK to avoid
+# needing to download it
 
 ROOT_DIR=$(realpath .)
 
@@ -74,7 +78,7 @@ endif
 endif
 endif
 endif
-SDK_URL=http://www.hyperion-entertainment.biz/index.php?option=com_registration&amp;view=download&amp;format=raw&amp;file=$(SDK_URL_FILE)
+SDK_URL=https://www.hyperion-entertainment.biz/index.php?option=com_registration&amp;view=download&amp;format=raw&amp;file=$(SDK_URL_FILE)
 
 # Native tools
 COREUTILS_SRC_DIR=../coreutils/repo
@@ -135,24 +139,32 @@ downloads-done-clib4:
 endif
 
 #
-# Downloads the SDK and libraries necesseary to build the cross compiler
+# Downloads the SDK and libraries necessary to build the cross compiler
 #
 DOWNLOADS_DONE_DEPENDENCY=downloads-done-clib2
 ifneq ($(CLIB4_SUPPORT),)
 DOWNLOADS_DONE_DEPENDENCY+=downloads-done-clib4
 endif
 downloads-done: $(DOWNLOADS_DONE_DEPENDENCY)
+ifneq ($(SDK_LOC),)
+	cp $(SDK_LOC)/SDK_$(SDK_VERSION).lha downloads/
+else
 	wget "$(SDK_URL)" -O downloads/SDK_$(SDK_VERSION).lha
-	cd downloads && wget -N http://ftp.gnu.org/gnu/gmp/$(GMP_ARCHIVE)
-	cd downloads && wget -N http://ftp.gnu.org/gnu/mpfr/$(MPFR_ARCHIVE)
-	cd downloads && wget -N http://ftp.gnu.org/gnu/mpc/$(MPC_ARCHIVE)
+endif
+	cd downloads && wget -N https://ftp.gnu.org/gnu/gmp/$(GMP_ARCHIVE)
+	cd downloads && wget -N https://ftp.gnu.org/gnu/mpfr/$(MPFR_ARCHIVE)
+	cd downloads && wget -N https://ftp.gnu.org/gnu/mpc/$(MPC_ARCHIVE)
 	touch $@
 
 #
 # Builds the cross binutils package (assembler, etc).
 #
 binutils-cross-build-done-$(BINUTILS_VERSION):
-	$(MAKE) -C ../binutils-build SRC_DIR=$(BINUTILS_SRC_DIR) PREFIX=$(CROSS_PREFIX) CROSS_BUILD_DIR=$(ROOT_DIR)/binutils-cross-build-$(BINUTILS_VERSION)
+	$(MAKE) -C ../binutils-build \
+		SRC_DIR=$(BINUTILS_SRC_DIR) \
+		PREFIX=$(CROSS_PREFIX) \
+		VERSION=$(BINUTILS_VERSION) \
+		CROSS_BUILD_DIR=$(ROOT_DIR)/binutils-cross-build-$(BINUTILS_VERSION)
 	touch $@
 
 .PHONY: binutils-build
@@ -325,6 +337,7 @@ binutils-native-done-$(BINUTILS_VERSION): libraries-done
 	PATH="$(CROSS_PREFIX)/bin:$(PATH)" $(MAKE) -C ../binutils-build native \
 			SRC_DIR=$(BINUTILS_SRC_DIR) \
 			PREFIX=/gcc \
+			VERSION=$(BINUTILS_VERSION) \
 			NATIVE_BUILD_DIR=$(ROOT_DIR)/binutils-native-build-$(BINUTILS_VERSION)
 	touch $@
 
@@ -502,6 +515,8 @@ private-native-separate-dist:
 	$(foreach var,$(wildcard $(ROOT_DIR)/root-native-gcc/gcc/bin/*), $(STRIP) $(STRIPFLAGS) $(var) ; ) true
 	$(STRIP) $(STRIPFLAGS) $(ROOT_DIR)/root-native-gcc/gcc/libexec/gcc/ppc-amigaos/$(GCC_VERSION)/cc1
 	$(STRIP) $(STRIPFLAGS) $(ROOT_DIR)/root-native-gcc/gcc/libexec/gcc/ppc-amigaos/$(GCC_VERSION)/cc1plus
+	$(STRIP) $(STRIPFLAGS) $(ROOT_DIR)/root-native-gcc/gcc/libexec/gcc/ppc-amigaos/$(GCC_VERSION)/cc1obj
+	$(STRIP) $(STRIPFLAGS) $(ROOT_DIR)/root-native-gcc/gcc/libexec/gcc/ppc-amigaos/$(GCC_VERSION)/cc1objplus
 	$(STRIP) $(STRIPFLAGS) $(ROOT_DIR)/root-native-gcc/gcc/libexec/gcc/ppc-amigaos/$(GCC_VERSION)/lto1
 	$(STRIP) $(STRIPFLAGS) $(ROOT_DIR)/root-native-gcc/gcc/libexec/gcc/ppc-amigaos/$(GCC_VERSION)/lto-wrapper
 	rm -Rf dist
@@ -518,6 +533,8 @@ native-strip-really:
 	$(foreach var,$(wildcard /gcc/bin/*), $(STRIP) --strip-all --strip-unneeded-rel-relocs $(var) ; ) true
 	$(STRIP) $(STRIPFLAGS) /gcc/libexec/gcc/ppc-amigaos/$(GCC_VERSION)/cc1
 	$(STRIP) $(STRIPFLAGS) /gcc/libexec/gcc/ppc-amigaos/$(GCC_VERSION)/cc1plus
+	$(STRIP) $(STRIPFLAGS) /gcc/libexec/gcc/ppc-amigaos/$(GCC_VERSION)/cc1obj
+	$(STRIP) $(STRIPFLAGS) /gcc/libexec/gcc/ppc-amigaos/$(GCC_VERSION)/cc1objplus
 	$(STRIP) $(STRIPFLAGS) /gcc/libexec/gcc/ppc-amigaos/$(GCC_VERSION)/lto1
 	$(STRIP) $(STRIPFLAGS) /gcc/libexec/gcc/ppc-amigaos/$(GCC_VERSION)/lto-wrapper
 
