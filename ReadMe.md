@@ -15,9 +15,9 @@ https://sf.net/projects/adtools. It uses the concept of vendor branches
 but this is making quick progress nearly impossible, so a new approach
 is tested here.
 
-In contrast to the original approch, build products that are based on 
-other projects (e.g. gcc) are not imported directly into this 
-repository. Instead only the patches that need to be applied to a given 
+In contrast to the original approch, build products that are based on
+other projects (e.g. gcc) are not imported directly into this
+repository. Instead only the patches that need to be applied to a given
 base version (e.g. stock gcc 6) are directly stored and maintained.
 
 Installation
@@ -91,6 +91,8 @@ $ git submodule update
 ````
 With this, the softlink ```bin/gild``` and ```bin``` being in your command
 line path, you have access to the following commands:
+
+```gild``` supports Python3 and ```argcomplete``` is a necessary package.
 
 
 * ```gild list```: lists available components and branches. For instance
